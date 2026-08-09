@@ -13,6 +13,7 @@ import { lintCOBOL } from '../lib/validation/cobolLinter'
 import { loadTutorialContentFn } from '../hooks/useTutorialLoader'
 import { lintJCL } from '../lib/validation/jclLinter'
 import type { ValidationResult } from '../lib/validation/schemas'
+import { validateActivity } from '../lib/validation/activityValidator'
 import { DEFAULT_CODE_MAP } from '../lib/constants'
 import { z } from 'zod'
 
@@ -97,45 +98,39 @@ function LearnWorkspace() {
     setValidationResult(null)
     
     try {
+      let syntaxDiags: NonNullable<ValidationResult["diagnostics"]> = []
+      
       if (track === 'jcl') {
-        // Run client-side JCL Linter
-        const diags = lintJCL(code)
-        setValidationResult({
-          success: diags.length === 0,
-          diagnostics: diags,
-          output: diags.length === 0 ? "JCL syntax is valid." : undefined
-        })
-        if (diags.length === 0) markLessonCompleted(currentLessonId, code)
+        syntaxDiags = lintJCL(code)
       } else if (track === 'cobol') {
-        const diags = lintCOBOL(code)
-        
-        // If syntax is perfect, check if they used required keywords from the lesson
-        if (diags.length === 0) {
-           const requiredKeywords = currentModuleId === 'anatomy' ? ['IDENTIFICATION DIVISION', 'PROGRAM-ID'] : []
-           const missing = requiredKeywords.filter(kw => !code.toUpperCase().includes(kw))
-           
-           if (missing.length > 0) {
-             setValidationResult({
-               success: false,
-               diagnostics: [{ line: 1, message: `Missing required keywords: ${missing.join(', ')}`, severity: 'error' }],
-               output: ''
-             })
-           } else {
-             setValidationResult({
-               success: true,
-               diagnostics: [],
-               output: 'COBOL syntax is valid. Great job!'
-             })
-             // Mark lesson as complete
-             markLessonCompleted(currentLessonId, code)
-           }
-        } else {
-           setValidationResult({
-             success: false,
-             diagnostics: diags,
-             output: ''
-           })
-        }
+        syntaxDiags = lintCOBOL(code)
+      }
+
+      if (syntaxDiags.length > 0) {
+        setValidationResult({
+          success: false,
+          diagnostics: syntaxDiags,
+          output: ''
+        })
+        return
+      }
+
+      // Syntax is perfect, now validate the specific activity rules
+      const activityDiags = validateActivity(track, currentModuleId, code)
+      
+      if (activityDiags.length > 0) {
+        setValidationResult({
+          success: false,
+          diagnostics: activityDiags,
+          output: ''
+        })
+      } else {
+        setValidationResult({
+          success: true,
+          diagnostics: [],
+          output: 'Perfect! Activity complete.'
+        })
+        markLessonCompleted(currentLessonId, code)
       }
     } catch (err) {
       setValidationResult({

@@ -1,46 +1,40 @@
 import { createServerFn } from '@tanstack/react-start'
-import * as fs from 'node:fs'
-import * as path from 'node:path'
 import { z } from 'zod'
 
 const LoadTutorialSchema = z.object({
   track: z.string(),
   module: z.string(),
 })
+const markdownFiles = import.meta.glob('../content/tutorials/**/*.md', { 
+  eager: true, 
+  query: '?raw', 
+  import: 'default' 
+})
 
-// Since we are in the server context, we can read files
 export const loadTutorialContentFn = createServerFn({ method: 'GET' })
   .validator((data: unknown) => LoadTutorialSchema.parse(data))
   .handler(async ({ data }) => {
-    // Determine directory based on track
-    const dir = data.track === 'jcl' ? 'jcl' : 'cobol'
-    let filePath = ''
     try {
-      // Find the first file in the directory that includes the module id
-      const dirPath = path.join(
-        process.cwd(),
-        'src',
-        'content',
-        'tutorials',
-        dir,
+      // Determine directory based on track
+      const dir = data.track === 'jcl' ? 'jcl' : 'cobol'
+
+      // Keys look like: '../content/tutorials/cobol/anatomy.md'
+      const matchedKey = Object.keys(markdownFiles).find(
+        (key) =>
+          key.includes(`/${dir}/`) &&
+          key.includes(data.module) &&
+          key.endsWith('.md'),
       )
-      let filename = `${data.module}.md` // Fallback if no specific prefix
 
-      if (fs.existsSync(dirPath)) {
-        const files = fs.readdirSync(dirPath)
-        const matchedFile = files.find(
-          (f) => f.includes(data.module) && f.endsWith('.md'),
-        )
-        if (matchedFile) filename = matchedFile
+      if (matchedKey) {
+        const content = markdownFiles[matchedKey]
+        const markdown = content.replace(/^---[\s\S]+?---/, '').trim()
+        return { success: true, content: markdown }
+      } else {
+        throw new Error(`File not found for module: ${data.module}`)
       }
-
-      filePath = path.join(dirPath, filename)
-      const content = fs.readFileSync(filePath, 'utf-8')
-
-      const markdown = content.replace(/^---[\s\S]+?---/, '').trim()
-
-      return { success: true, content: markdown }
     } catch (e: any) {
+      console.error('Error loading tutorial content:', e)
       // Graceful fallback for unwritten modules
       return {
         success: true,

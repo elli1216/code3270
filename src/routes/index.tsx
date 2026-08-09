@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
-import { Terminal, Server, Database, Code, ShieldCheck, Github, ChevronRight } from 'lucide-react'
+import { Terminal, Server, Database, Code, ShieldCheck, ChevronRight } from 'lucide-react'
 
 export const Route = createFileRoute('/')({ component: LandingPage })
 
