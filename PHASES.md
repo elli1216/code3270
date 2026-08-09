@@ -58,9 +58,32 @@
 - Write introductory modules for the JCL tutorial, structured incrementally.
 
 **Files to Create:**
+* `src/components/tutorial/MarkdownViewer.tsx`: Reusable markdown rendering component to handle all lesson content.
+* `src/components/tutorial/LessonNavigation.tsx`: "Next/Previous" buttons and "Try it Yourself" action triggers.
+* `src/hooks/useTutorialLoader.ts`: Centralized logic for fetching and parsing tutorial content.
+* `src/content/tutorials/cobol/01-intro.md`: First COBOL lesson module.
 
-- `src/components/tutorial/MarkdownViewer.tsx`: Reusable markdown rendering component to handle all lesson content.
-- `src/components/tutorial/LessonNavigation.tsx`: "Next/Previous" buttons and "Try it Yourself" action triggers.
-- `src/hooks/useTutorialLoader.ts`: Centralized logic for fetching and parsing tutorial content.
-- `src/content/tutorials/cobol/01-intro.md`: First COBOL lesson module.
-- `src/content/tutorials/jcl/01-intro.md`: First JCL lesson module.
+## 📚 Curriculum Blueprint
+The platform features an integrated, interactive curriculum designed to take users from zero mainframe experience to writing production-ready batch pipelines.
+
+### Track 1: JCL & Mainframe Execution Essentials
+* **JCL Foundations:** Understanding the JOB, EXEC, and DD statements; Dataset Allocation (DSN, DISP, SPACE).
+* **Conditional Execution:** Utilizing COND parameters and IF/THEN/ELSE constructs for job control flow.
+* **System Utilities:** Implementing IEFBR14, IEBGENER, and DFSORT.
+* **Advanced JCL Capabilities:** Externalizing code using Cataloged Procedures (PROCs), In-Stream Procedures, and JCL Include (JCLLIB).
+* **Flexibility & Versioning:** Utilizing Symbolic Parameters for reusability and Generation Data Groups (GDGs) for managing multiple versions of related datasets.
+* **Resilience:** Implementing Restart and Recovery techniques for job failures.
+
+### Track 2: COBOL Core Programming Fundamentals
+* **COBOL Anatomy:** Mastering the Identification, Environment, Data, and Procedure Divisions.
+* **Data Types:** Utilizing PICTURE (PIC) clauses for alphanumeric and numeric variables, and internal representations (COMP).
+* **Control Flow:** Implementing IF/ELSE, EVALUATE, and PERFORM statements (loops).
+* **Table Handling (Arrays):** Managing fixed and variable-length tables using OCCURS and OCCURS DEPENDING ON; implementing sequential SEARCH and binary SEARCH ALL.
+* **Modular Design:** Structuring code using Copybooks, Nested Programs, and the CALL statement (BY REFERENCE, BY CONTENT).
+
+### Track 3: Advanced COBOL Processing
+* **Sequential File Handling:** Implementing SELECT...ASSIGN, FD, READ, WRITE, and CLOSE operations.
+* **Advanced File Processing:** Managing Key-Sequenced Datasets (VSAM KSDS) with dynamic reading and random access lookups.
+* **Exception Management:** Implementing robust error handling using FILE STATUS codes to prevent program crashes.
+
+*(Note: Database (DB2) and Online Transaction Processing (CICS) integration will be added in future updates).*
