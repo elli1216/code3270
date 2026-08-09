@@ -1,251 +1,176 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
-import { Terminal, Server, Database, Code, ShieldCheck, ChevronRight } from 'lucide-react'
+import { Terminal, Server, Code, ChevronRight, CheckCircle2 } from 'lucide-react'
 
 export const Route = createFileRoute('/')({ component: LandingPage })
 
 function LandingPage() {
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 selection:bg-emerald-500/30 overflow-hidden relative flex flex-col">
-      {/* Dynamic Background Elements */}
+    <div className="min-h-screen bg-[#0a0f12] text-slate-200 selection:bg-emerald-500/30 overflow-hidden relative flex flex-col font-sans">
+      {/* Background Elements */}
       <div className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-900/20 rounded-full blur-[120px] mix-blend-screen" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-600/10 rounded-full blur-[100px] mix-blend-screen" />
-        {/* Subtle grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_80%)]" />
+        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-emerald-900/10 rounded-full blur-[140px] mix-blend-screen" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-emerald-600/10 rounded-full blur-[140px] mix-blend-screen" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_70%)]" />
       </div>
 
-      {/* Header */}
-      <header className="relative z-20 w-full border-b border-white/5 bg-slate-950/50 backdrop-blur-md">
+      {/* Modern Glassmorphic Header */}
+      <header className="fixed top-0 inset-x-0 z-50 w-full border-b border-white/5 bg-[#0a0f12]/70 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-emerald-400 font-mono font-bold text-xl tracking-tight">
-            <Terminal size={24} />
-            <span>Code3270</span>
+          <div className="flex items-center gap-2.5 text-emerald-400 font-mono font-bold text-xl tracking-tight group cursor-pointer">
+            <div className="bg-emerald-500/10 p-1.5 rounded-md border border-emerald-500/20 group-hover:bg-emerald-500/20 transition-colors">
+              <Terminal size={20} className="text-emerald-400" />
+            </div>
+            <span className="text-slate-100 group-hover:text-white transition-colors">Code3270</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Link
-              to="/learn"
-              className="px-4 py-2 text-sm font-semibold bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-slate-950 border border-emerald-500/50 hover:border-emerald-500 rounded-md transition-all"
-            >
-              Start Coding
-            </Link>
+          <div className="flex items-center gap-3">
             <Link
               to="/syntax"
-              className="px-4 py-2 text-sm font-semibold bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-slate-950 border border-emerald-500/50 hover:border-emerald-500 rounded-md transition-all"
+              className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-emerald-400 transition-colors"
             >
               Syntax Checker
+            </Link>
+            <Link
+              to="/learn"
+              className="px-5 py-2 text-sm font-semibold bg-emerald-500 text-slate-950 hover:bg-emerald-400 rounded-md transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)]"
+            >
+              Start Learning
             </Link>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="relative z-10 max-w-6xl mx-auto px-6 py-20 lg:py-28 flex flex-col items-center flex-1">
-
-        {/* Hero Section */}
+      {/* Hero Section */}
+      <main className="relative z-10 max-w-7xl mx-auto px-6 pt-32 pb-20 lg:pt-48 lg:pb-32 flex flex-col items-center flex-1 w-full">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="text-center max-w-4xl mx-auto mb-24"
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="text-center max-w-4xl mx-auto mb-20"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 mb-8 font-mono text-sm shadow-[0_0_15px_rgba(16,185,129,0.1)]">
-            <Terminal size={16} />
-            <span>INITIALIZING SYS1.PROCLIB...</span>
-          </div>
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/5 border border-emerald-500/20 text-emerald-400 mb-8 font-mono text-[13px] shadow-[0_0_20px_rgba(16,185,129,0.05)]"
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            INITIALIZING SYS1.PROCLIB...
+          </motion.div>
 
-          <h1 className="text-5xl lg:text-7xl font-bold tracking-tight mb-8 bg-clip-text text-transparent bg-gradient-to-br from-white to-emerald-200">
-            Master the Engines of <br /> Global Commerce
+          <h1 className="text-5xl lg:text-7xl font-bold tracking-tight mb-8 text-white">
+            Master the Engines of <br /> 
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-200">
+              Global Commerce
+            </span>
           </h1>
 
-          <p className="text-xl text-slate-400 leading-relaxed mb-10 max-w-2xl mx-auto">
-            Code3270 is a frictionless, web-based platform to learn, write, and validate
-            <span className="text-emerald-300 font-semibold mx-1">COBOL</span> and
-            <span className="text-emerald-300 font-semibold mx-1">JCL</span>.
-            No mainframes to configure. Just code.
+          <p className="text-lg lg:text-xl text-slate-400 leading-relaxed mb-10 max-w-2xl mx-auto font-light">
+            A frictionless, interactive web platform to learn, write, and validate
+            <strong className="text-emerald-300 font-medium mx-1.5">COBOL</strong> and
+            <strong className="text-emerald-300 font-medium mx-1.5">JCL</strong>.
+            No mainframes to configure. Just pure code.
           </p>
 
-          <Link
-            to="/learn"
-            className="group relative inline-flex items-center gap-3 px-8 py-4 bg-emerald-400 hover:bg-emerald-300 text-slate-950 rounded-lg font-bold text-lg transition-all shadow-[0_0_30px_rgba(52,211,153,0.2)] hover:shadow-[0_0_40px_rgba(52,211,153,0.4)] overflow-hidden"
-          >
-            <span className="relative z-10">Start Learning Now</span>
-            <ChevronRight size={20} className="relative z-10 group-hover:translate-x-1 transition-transform" />
-            <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              to="/learn"
+              className="group relative inline-flex items-center gap-3 px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-xl font-bold text-lg transition-all shadow-[0_0_30px_rgba(52,211,153,0.2)] hover:shadow-[0_0_50px_rgba(52,211,153,0.4)] overflow-hidden w-full sm:w-auto justify-center"
+            >
+              <span className="relative z-10">Launch Workspace</span>
+              <ChevronRight size={20} className="relative z-10 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <Link
+              to="/syntax"
+              className="group inline-flex items-center gap-3 px-8 py-4 bg-slate-800/50 hover:bg-slate-800 text-slate-200 rounded-xl font-semibold text-lg transition-all border border-slate-700 hover:border-slate-600 w-full sm:w-auto justify-center"
+            >
+              Try Sandbox
+            </Link>
+          </div>
         </motion.div>
 
-        {/* The History & Relevance Section */}
-        <div id="features" className="grid md:grid-cols-2 gap-12 w-full mt-4">
-
-          {/* COBOL History Card */}
+        {/* Feature Grid */}
+        <div className="grid md:grid-cols-2 gap-8 w-full">
+          {/* Card 1 */}
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6 }}
-            className="p-8 rounded-2xl bg-slate-900/50 border border-slate-800 backdrop-blur-md relative overflow-hidden group hover:border-emerald-500/30 transition-colors"
+            className="p-10 rounded-3xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-xl relative overflow-hidden group hover:bg-slate-900/60 transition-all hover:border-emerald-500/30"
           >
-            <div className="absolute top-0 right-0 p-32 bg-emerald-500/5 rounded-full blur-3xl group-hover:bg-emerald-500/10 transition-colors" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl group-hover:bg-emerald-500/10 transition-colors" />
             <div className="relative z-10">
-              <div className="w-12 h-12 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-700 mb-6 text-emerald-400">
-                <Code size={24} />
+              <div className="w-14 h-14 rounded-2xl bg-slate-800/80 flex items-center justify-center border border-slate-700/50 mb-8 text-emerald-400 shadow-lg shadow-emerald-900/20">
+                <Code size={28} />
               </div>
-              <h2 className="text-2xl font-bold mb-4 text-slate-100">The Legacy of COBOL</h2>
-              <p className="text-slate-400 leading-relaxed mb-4">
-                Created in 1959 by the CODASYL committee (heavily influenced by Grace Hopper),
-                <strong> COBOL (Common Business-Oriented Language)</strong> was designed to be readable like English.
+              <h2 className="text-3xl font-bold mb-4 text-slate-100">The Legacy of COBOL</h2>
+              <p className="text-slate-400 leading-relaxed mb-8 font-light text-lg">
+                Created in 1959, COBOL remains the backbone of the global financial system, processing trillions of dollars daily in absolute stability.
               </p>
-              <ul className="space-y-3 text-slate-400 mt-6">
-                <li className="flex items-start gap-3">
-                  <ShieldCheck className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>Powers <strong>80%</strong> of in-person financial transactions globally.</span>
+              <ul className="space-y-4 text-slate-300">
+                <li className="flex items-center gap-3">
+                  <CheckCircle2 size={20} className="text-emerald-500 shrink-0" />
+                  <span>Processes 85% of global business transactions</span>
                 </li>
-                <li className="flex items-start gap-3">
-                  <ShieldCheck className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>Processes over <strong>$3 trillion</strong> in commerce every single day.</span>
+                <li className="flex items-center gap-3">
+                  <CheckCircle2 size={20} className="text-emerald-500 shrink-0" />
+                  <span>Powers 95% of ATM swipes worldwide</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle2 size={20} className="text-emerald-500 shrink-0" />
+                  <span>Over 220 billion lines of active code in production</span>
                 </li>
               </ul>
             </div>
           </motion.div>
 
-          {/* JCL History Card */}
+          {/* Card 2 */}
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="p-8 rounded-2xl bg-slate-900/50 border border-slate-800 backdrop-blur-md relative overflow-hidden group hover:border-emerald-500/30 transition-colors"
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="p-10 rounded-3xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-xl relative overflow-hidden group hover:bg-slate-900/60 transition-all hover:border-emerald-500/30"
           >
-            <div className="absolute top-0 right-0 p-32 bg-emerald-500/5 rounded-full blur-3xl group-hover:bg-emerald-500/10 transition-colors" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl group-hover:bg-emerald-500/10 transition-colors" />
             <div className="relative z-10">
-              <div className="w-12 h-12 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-700 mb-6 text-emerald-400">
-                <Server size={24} />
+              <div className="w-14 h-14 rounded-2xl bg-slate-800/80 flex items-center justify-center border border-slate-700/50 mb-8 text-emerald-400 shadow-lg shadow-emerald-900/20">
+                <Server size={28} />
               </div>
-              <h2 className="text-2xl font-bold mb-4 text-slate-100">The Power of JCL</h2>
-              <p className="text-slate-400 leading-relaxed mb-4">
-                Introduced in 1964 for IBM's OS/360, <strong>JCL (Job Control Language)</strong> is the scripting language that tells the mainframe OS exactly how to run programs and manage resources.
+              <h2 className="text-3xl font-bold mb-4 text-slate-100">Modern Architecture</h2>
+              <p className="text-slate-400 leading-relaxed mb-8 font-light text-lg">
+                Learn legacy technologies using a state-of-the-art interactive workspace. No emulators, no downloads, just instant feedback.
               </p>
-              <ul className="space-y-3 text-slate-400 mt-6">
-                <li className="flex items-start gap-3">
-                  <Database className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>The backbone of enterprise batch processing and jobs.</span>
+              <ul className="space-y-4 text-slate-300">
+                <li className="flex items-center gap-3">
+                  <CheckCircle2 size={20} className="text-emerald-500 shrink-0" />
+                  <span>In-browser local syntax validation engine</span>
                 </li>
-                <li className="flex items-start gap-3">
-                  <Database className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>Strict positional syntax requiring logic and precision.</span>
+                <li className="flex items-center gap-3">
+                  <CheckCircle2 size={20} className="text-emerald-500 shrink-0" />
+                  <span>Intelligent Activity Constraints Engine (ACE)</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle2 size={20} className="text-emerald-500 shrink-0" />
+                  <span>Monaco Editor with strict column rendering</span>
                 </li>
               </ul>
             </div>
           </motion.div>
-
-        </div>
-
-        {/* Detailed History Timeline */}
-        <div className="mt-24 w-full max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-slate-100 mb-4">A Legacy of Computing</h2>
-            <p className="text-slate-400">The evolution of the systems that built the modern world.</p>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-16">
-            {/* COBOL Timeline */}
-            <div className="relative border-l border-slate-800 ml-3 lg:ml-0 pl-8 lg:pl-10">
-              <div className="absolute top-0 left-[-16px] bg-slate-900 border border-slate-700 p-2 rounded-lg text-emerald-400">
-                <Code size={16} />
-              </div>
-              <h3 className="text-2xl font-bold text-emerald-400 mb-8 pt-1">COBOL History</h3>
-
-              <div className="space-y-8">
-                <div className="relative">
-                  <div className="absolute -left-[45px] top-1.5 w-3 h-3 bg-slate-800 border-2 border-emerald-500 rounded-full" />
-                  <h4 className="text-slate-200 font-bold mb-1">Origins & Inception (1950s)</h4>
-                  <p className="text-sm text-slate-400 leading-relaxed">The US Department of Defense convened a conference in May 1958 to discuss creating a common business language.</p>
-                </div>
-                <div className="relative">
-                  <div className="absolute -left-[45px] top-1.5 w-3 h-3 bg-slate-800 border-2 border-emerald-500 rounded-full" />
-                  <h4 className="text-slate-200 font-bold mb-1">Creation & Specs (1959)</h4>
-                  <p className="text-sm text-slate-400 leading-relaxed">Developed by CODASYL, partly derived from FLOW-MATIC by Dr. Grace Hopper. First specifications released in December 1959.</p>
-                </div>
-                <div className="relative">
-                  <div className="absolute -left-[45px] top-1.5 w-3 h-3 bg-slate-800 border-2 border-emerald-500 rounded-full" />
-                  <h4 className="text-slate-200 font-bold mb-1">First Release (1960–1965)</h4>
-                  <p className="text-sm text-slate-400 leading-relaxed">COBOL-60 was published. The first compiler arrived for mainframes in 1962, and COBOL-65 introduced mass storage and table handling.</p>
-                </div>
-                <div className="relative">
-                  <div className="absolute -left-[45px] top-1.5 w-3 h-3 bg-slate-800 border-2 border-emerald-500 rounded-full" />
-                  <h4 className="text-slate-200 font-bold mb-1">Standardization (1968–1985)</h4>
-                  <p className="text-sm text-slate-400 leading-relaxed">Standardized as ANSI-68. Revisions followed with COBOL-74 and COBOL-85.</p>
-                </div>
-                <div className="relative">
-                  <div className="absolute -left-[45px] top-1.5 w-3 h-3 bg-slate-800 border-2 border-emerald-500 rounded-full" />
-                  <h4 className="text-slate-200 font-bold mb-1">Modernization (1990s–Present)</h4>
-                  <p className="text-sm text-slate-400 leading-relaxed">COBOL 2002 added object-orientation. Recent updates (2014-2023) introduced IEEE 754 data types, async messaging, and transaction processing features.</p>
-                </div>
-              </div>
-            </div>
-
-            {/* JCL Timeline */}
-            <div className="relative border-l border-slate-800 ml-3 lg:ml-0 pl-8 lg:pl-10 mt-12 lg:mt-0">
-              <div className="absolute top-0 left-[-16px] bg-slate-900 border border-slate-700 p-2 rounded-lg text-emerald-400">
-                <Server size={16} />
-              </div>
-              <h3 className="text-2xl font-bold text-emerald-400 mb-8 pt-1">JCL & OS/360 Timeline</h3>
-
-              <div className="space-y-8">
-                <div className="relative">
-                  <div className="absolute -left-[45px] top-1.5 w-3 h-3 bg-slate-800 border-2 border-emerald-500 rounded-full" />
-                  <h4 className="text-slate-200 font-bold mb-1">OS/360 Announcement (1964)</h4>
-                  <p className="text-sm text-slate-400 leading-relaxed">Announced by IBM as a batch processing operating system to operate its 360 family of mainframe computer systems.</p>
-                </div>
-                <div className="relative">
-                  <div className="absolute -left-[45px] top-1.5 w-3 h-3 bg-slate-800 border-2 border-emerald-500 rounded-full" />
-                  <h4 className="text-slate-200 font-bold mb-1">Initial Release (1966)</h4>
-                  <p className="text-sm text-slate-400 leading-relaxed">Released with ~1 million lines of code. It was one of the earliest operating systems to require a direct access storage device.</p>
-                </div>
-                <div className="relative">
-                  <div className="absolute -left-[45px] top-1.5 w-3 h-3 bg-slate-800 border-2 border-emerald-500 rounded-full" />
-                  <h4 className="text-slate-200 font-bold mb-1">OS Variants</h4>
-                  <p className="text-sm text-slate-400 leading-relaxed">Evolved through PCP (single job), MFT (fixed memory tasks for mid-range), and MVT (variable tasks for top-end mainframes).</p>
-                </div>
-                <div className="relative">
-                  <div className="absolute -left-[45px] top-1.5 w-3 h-3 bg-slate-800 border-2 border-emerald-500 rounded-full" />
-                  <h4 className="text-slate-200 font-bold mb-1">Virtual Memory Evolution (1970s)</h4>
-                  <p className="text-sm text-slate-400 leading-relaxed">OS/MFT became OS/VS1 (integrating JES1). OS/MVT became OS/VS2, bringing virtual memory capabilities to the mainframe.</p>
-                </div>
-                <div className="relative">
-                  <div className="absolute -left-[45px] top-1.5 w-3 h-3 bg-slate-800 border-2 border-emerald-500 rounded-full" />
-                  <h4 className="text-slate-200 font-bold mb-1">Modern Successors (1990s–2000s)</h4>
-                  <p className="text-sm text-slate-400 leading-relaxed">OS/VS2 evolved into OS/MVS. Succeeded by System/390 in 1990 and z/OS in 2000, maintaining application-level compatibility with original OS/360 code.</p>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </main>
-
+      
       {/* Footer */}
-      <footer className="relative z-20 w-full border-t border-white/5 bg-slate-950/80">
-        <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-slate-500 font-mono text-sm">
-            <Terminal size={16} />
-            <span>Code3270 © {new Date().getFullYear()}</span>
-          </div>
-          <div className="flex items-center gap-6 text-sm text-slate-500">
-            <a href="#" className="hover:text-emerald-400 transition-colors">Privacy</a>
-            <a href="#" className="hover:text-emerald-400 transition-colors">Terms</a>
-            <a href="https://github.com/yourusername/Code3270" target="_blank" rel="noreferrer" className="hover:text-emerald-400 transition-colors">
-              Contribute on GitHub
-            </a>
+      <footer className="w-full border-t border-slate-800/60 bg-[#0a0f12]/80 backdrop-blur-sm relative z-20">
+        <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between text-slate-500 text-sm">
+          <p>© 2026 Code3270. Built for the next generation of mainframe engineers.</p>
+          <div className="flex gap-6 mt-4 md:mt-0">
+            <Link to="/learn" className="hover:text-emerald-400 transition-colors">Curriculum</Link>
+            <Link to="/syntax" className="hover:text-emerald-400 transition-colors">Playground</Link>
           </div>
         </div>
       </footer>
-
-      <style>{`
-        @keyframes shimmer {
-          100% { transform: translateX(100%); }
-        }
-      `}</style>
     </div>
   )
 }

@@ -13,12 +13,14 @@ interface ProgressState {
   saveLessonCode: (lessonId: string, code: string) => void
   isLessonCompleted: (lessonId: string) => boolean
   getLessonCode: (lessonId: string) => string | undefined
+  resetProgress: () => void
 }
 
 export const useProgressStore = create<ProgressState>()(
   persist(
     (set, get) => ({
       completedLessons: {},
+      resetProgress: () => set({ completedLessons: {} }),
       
       markLessonCompleted: (lessonId, code) => set((state) => ({
         completedLessons: {
