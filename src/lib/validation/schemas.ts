@@ -21,7 +21,9 @@ export type ValidationResult = z.infer<typeof ValidationResultSchema>
 // Payload for COBOL API validation
 export const CobolValidationPayloadSchema = z.object({
   sourceCode: z.string().min(1, 'Source code cannot be empty'),
-  compilerOptions: z.array(z.string()).optional()
+  compilerOptions: z.array(z.string()).optional(),
 })
 
-export type CobolValidationPayload = z.infer<typeof CobolValidationPayloadSchema>
+export type CobolValidationPayload = z.infer<
+  typeof CobolValidationPayloadSchema
+>

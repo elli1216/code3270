@@ -2,12 +2,16 @@ import type { Diagnostic } from './schemas.ts'
 import { JCL_SPECS } from './constants.ts'
 
 export interface JclContext {
-  inContinuation: boolean;
-  activeParamContext: string;
+  inContinuation: boolean
+  activeParamContext: string
 }
 
 export interface JclRule {
-  evaluateLine: (line: string, lineNum: number, context: JclContext) => Diagnostic[];
+  evaluateLine: (
+    line: string,
+    lineNum: number,
+    context: JclContext,
+  ) => Diagnostic[]
 }
 
 export const PrefixRule: JclRule = {
@@ -17,11 +21,15 @@ export const PrefixRule: JclRule = {
       // Valid JCL statement
     } else if (line.startsWith('/*')) {
       // In-stream delimiter - valid
-    } else if (line.trimStart().startsWith('//') || line.trimStart().startsWith('/*')) {
+    } else if (
+      line.trimStart().startsWith('//') ||
+      line.trimStart().startsWith('/*')
+    ) {
       diags.push({
         line: lineNum,
         column: 1,
-        message: 'JCL statements must begin strictly in Column 1 with "//" or "/*". Leading spaces are invalid.',
+        message:
+          'JCL statements must begin strictly in Column 1 with "//" or "/*". Leading spaces are invalid.',
         severity: 'error',
       })
     } else {
@@ -33,13 +41,18 @@ export const PrefixRule: JclRule = {
       })
     }
     return diags
-  }
+  },
 }
 
 export const ContinuationRule: JclRule = {
   evaluateLine(line, lineNum, context) {
     const diags: Diagnostic[] = []
-    if (line.startsWith('/*') || line.startsWith('//*') || !line.trimStart().startsWith('//')) return diags
+    if (
+      line.startsWith('/*') ||
+      line.startsWith('//*') ||
+      !line.trimStart().startsWith('//')
+    )
+      return diags
 
     if (context.inContinuation) {
       const afterPrefix = line.substring(2)
@@ -49,7 +62,8 @@ export const ContinuationRule: JclRule = {
         diags.push({
           line: lineNum,
           column: 3,
-          message: 'Empty continuation line. Expected parameter continuation between columns 4 and 16.',
+          message:
+            'Empty continuation line. Expected parameter continuation between columns 4 and 16.',
           severity: 'error',
         })
       } else {
@@ -65,14 +79,19 @@ export const ContinuationRule: JclRule = {
       }
     }
     return diags
-  }
+  },
 }
 
 export const NameAndOperationRule: JclRule = {
   evaluateLine(line, lineNum, context) {
     const diags: Diagnostic[] = []
-    if (line.startsWith('/*') || line.startsWith('//*') || !line.trimStart().startsWith('//')) return diags
-    
+    if (
+      line.startsWith('/*') ||
+      line.startsWith('//*') ||
+      !line.trimStart().startsWith('//')
+    )
+      return diags
+
     const effectiveLine = line.length > 71 ? line.substring(0, 71) : line
     const restOfLine = effectiveLine.substring(2)
 
@@ -82,10 +101,20 @@ export const NameAndOperationRule: JclRule = {
         if (nameMatch) {
           const name = nameMatch[1]
           if (name.length > JCL_SPECS.MAX_NAME_LENGTH) {
-            diags.push({ line: lineNum, column: 3, message: `JCL Name '${name}' exceeds maximum allowed length of ${JCL_SPECS.MAX_NAME_LENGTH} characters.`, severity: 'error' })
+            diags.push({
+              line: lineNum,
+              column: 3,
+              message: `JCL Name '${name}' exceeds maximum allowed length of ${JCL_SPECS.MAX_NAME_LENGTH} characters.`,
+              severity: 'error',
+            })
           }
           if (!JCL_SPECS.NAME_PATTERN.test(name)) {
-            diags.push({ line: lineNum, column: 3, message: `JCL Name '${name}' is invalid. Must start with A-Z, $, #, or @, followed by alphanumeric or national characters.`, severity: 'error' })
+            diags.push({
+              line: lineNum,
+              column: 3,
+              message: `JCL Name '${name}' is invalid. Must start with A-Z, $, #, or @, followed by alphanumeric or national characters.`,
+              severity: 'error',
+            })
           }
 
           const afterNameIndex = restOfLine.indexOf(' ', name.length)
@@ -108,14 +137,19 @@ export const NameAndOperationRule: JclRule = {
       }
     }
     return diags
-  }
+  },
 }
 
 export const OperandAndSpaceRule: JclRule = {
   evaluateLine(line, lineNum, context) {
     const diags: Diagnostic[] = []
-    if (line.startsWith('/*') || line.startsWith('//*') || !line.trimStart().startsWith('//')) return diags
-    
+    if (
+      line.startsWith('/*') ||
+      line.startsWith('//*') ||
+      !line.trimStart().startsWith('//')
+    )
+      return diags
+
     const effectiveLine = line.length > 71 ? line.substring(0, 71) : line
     const restOfLine = effectiveLine.substring(2)
     let operandString = ''
@@ -161,11 +195,19 @@ export const OperandAndSpaceRule: JclRule = {
             currentToken = ''
           } else if (char === ')') {
             parenCount--
-            if (context.activeParamContext === 'DISP' && currentToken.length > 0) {
-              if (!JCL_SPECS.DISP_SUBPARAMETERS.includes(currentToken.toUpperCase())) {
+            if (
+              context.activeParamContext === 'DISP' &&
+              currentToken.length > 0
+            ) {
+              if (
+                !JCL_SPECS.DISP_SUBPARAMETERS.includes(
+                  currentToken.toUpperCase(),
+                )
+              ) {
                 diags.push({
                   line: lineNum,
-                  column: line.indexOf(operandString) + i - currentToken.length + 1,
+                  column:
+                    line.indexOf(operandString) + i - currentToken.length + 1,
                   message: `Invalid DISP subparameter '${currentToken}'. Valid values are: ${JCL_SPECS.DISP_SUBPARAMETERS.join(', ')}.`,
                   severity: 'error',
                 })
@@ -176,11 +218,19 @@ export const OperandAndSpaceRule: JclRule = {
             context.activeParamContext = currentToken.toUpperCase()
             currentToken = ''
           } else if (char === ',') {
-            if (context.activeParamContext === 'DISP' && currentToken.length > 0) {
-              if (!JCL_SPECS.DISP_SUBPARAMETERS.includes(currentToken.toUpperCase())) {
+            if (
+              context.activeParamContext === 'DISP' &&
+              currentToken.length > 0
+            ) {
+              if (
+                !JCL_SPECS.DISP_SUBPARAMETERS.includes(
+                  currentToken.toUpperCase(),
+                )
+              ) {
                 diags.push({
                   line: lineNum,
-                  column: line.indexOf(operandString) + i - currentToken.length + 1,
+                  column:
+                    line.indexOf(operandString) + i - currentToken.length + 1,
                   message: `Invalid DISP subparameter '${currentToken}'. Valid values are: ${JCL_SPECS.DISP_SUBPARAMETERS.join(', ')}.`,
                   severity: 'error',
                 })
@@ -197,11 +247,24 @@ export const OperandAndSpaceRule: JclRule = {
       }
 
       if (operandEndIndex !== -1 || currentToken.length > 0) {
-        if (context.activeParamContext === 'DISP' && currentToken.length > 0 && !inSingleQuote && !inDoubleQuote) {
-          if (!JCL_SPECS.DISP_SUBPARAMETERS.includes(currentToken.toUpperCase())) {
+        if (
+          context.activeParamContext === 'DISP' &&
+          currentToken.length > 0 &&
+          !inSingleQuote &&
+          !inDoubleQuote
+        ) {
+          if (
+            !JCL_SPECS.DISP_SUBPARAMETERS.includes(currentToken.toUpperCase())
+          ) {
             diags.push({
               line: lineNum,
-              column: line.indexOf(operandString) + (operandEndIndex !== -1 ? operandEndIndex : operandString.length) - currentToken.length + 1,
+              column:
+                line.indexOf(operandString) +
+                (operandEndIndex !== -1
+                  ? operandEndIndex
+                  : operandString.length) -
+                currentToken.length +
+                1,
               message: `Invalid DISP subparameter '${currentToken}'. Valid values are: ${JCL_SPECS.DISP_SUBPARAMETERS.join(', ')}.`,
               severity: 'error',
             })
@@ -210,16 +273,28 @@ export const OperandAndSpaceRule: JclRule = {
       }
 
       if (inSingleQuote || inDoubleQuote) {
-        diags.push({ line: lineNum, column: 3, message: 'Unclosed string quote in JCL operand field.', severity: 'error' })
+        diags.push({
+          line: lineNum,
+          column: 3,
+          message: 'Unclosed string quote in JCL operand field.',
+          severity: 'error',
+        })
       }
 
       if (parenCount !== 0) {
-        diags.push({ line: lineNum, column: 3, message: `Unbalanced parentheses in JCL operand field (${Math.abs(parenCount)} ${parenCount > 0 ? 'unclosed' : 'extra'} parenthesis).`, severity: 'error' })
+        diags.push({
+          line: lineNum,
+          column: 3,
+          message: `Unbalanced parentheses in JCL operand field (${Math.abs(parenCount)} ${parenCount > 0 ? 'unclosed' : 'extra'} parenthesis).`,
+          severity: 'error',
+        })
       }
 
       if (operandEndIndex !== -1) {
         const actualOperands = operandString.substring(0, operandEndIndex)
-        const commentSection = operandString.substring(operandEndIndex + 1).trim()
+        const commentSection = operandString
+          .substring(operandEndIndex + 1)
+          .trim()
 
         if (actualOperands.endsWith(',') || actualOperands.endsWith('=')) {
           diags.push({
@@ -228,7 +303,10 @@ export const OperandAndSpaceRule: JclRule = {
             message: `Unquoted space after '${actualOperands.slice(-1)}' in operand field. In JCL, spaces terminate parameters and begin comments.`,
             severity: 'error',
           })
-        } else if (commentSection.includes('=') || commentSection.startsWith('(')) {
+        } else if (
+          commentSection.includes('=') ||
+          commentSection.startsWith('(')
+        ) {
           diags.push({
             line: lineNum,
             column: 3 + operandEndIndex,
@@ -240,17 +318,22 @@ export const OperandAndSpaceRule: JclRule = {
     }
 
     return diags
-  }
+  },
 }
 
 export const LineLengthRule: JclRule = {
   evaluateLine(line, lineNum) {
     const diags: Diagnostic[] = []
     if (line.length > 80) {
-      diags.push({ line: lineNum, column: 73, message: 'JCL statement exceeds standard 80-column punch card format.', severity: 'warning' })
+      diags.push({
+        line: lineNum,
+        column: 73,
+        message: 'JCL statement exceeds standard 80-column punch card format.',
+        severity: 'warning',
+      })
     }
     return diags
-  }
+  },
 }
 
 export const ALL_JCL_RULES: JclRule[] = [
@@ -258,5 +341,5 @@ export const ALL_JCL_RULES: JclRule[] = [
   ContinuationRule,
   NameAndOperationRule,
   OperandAndSpaceRule,
-  LineLengthRule
+  LineLengthRule,
 ]
