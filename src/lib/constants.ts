@@ -1,11 +1,11 @@
 export const DEFAULT_CODE_MAP: Record<string, string> = {
-  'cobol': `       IDENTIFICATION DIVISION.
+  cobol: `       IDENTIFICATION DIVISION.
        PROGRAM-ID. HELLO-WORLD.
        PROCEDURE DIVISION.
            DISPLAY 'HELLO WORLD!'.
            STOP RUN.`,
-  'jcl': `//JOBNAME  JOB (ACCT),'NAME',MSGCLASS=X
-//STEP1    EXEC PGM=IEFBR14`
+  jcl: `//JOBNAME  JOB (ACCT),'NAME',MSGCLASS=X
+//STEP1    EXEC PGM=IEFBR14`,
 }
 
 export const SAMPLE_PROGRAMS = {
@@ -16,7 +16,7 @@ export const SAMPLE_PROGRAMS = {
        PROGRAM-ID. HELLO-WORLD.
        PROCEDURE DIVISION.
            DISPLAY 'Hello, World!'.
-           STOP RUN.`
+           STOP RUN.`,
   },
   'cobol-math': {
     name: 'Basic Math (COBOL)',
@@ -31,7 +31,7 @@ export const SAMPLE_PROGRAMS = {
        PROCEDURE DIVISION.
            ADD NUM1 TO NUM2 GIVING RESULT.
            DISPLAY 'The result of 10 + 20 is: ' RESULT.
-           STOP RUN.`
+           STOP RUN.`,
   },
   'jcl-basic': {
     name: 'Basic Job (JCL)',
@@ -39,6 +39,6 @@ export const SAMPLE_PROGRAMS = {
     code: `//MYJOB    JOB (123),'JOHN DOE',CLASS=A,MSGCLASS=X
 //STEP1    EXEC PGM=IEFBR14
 //DD1      DD DSN=MY.DATA.SET,DISP=(NEW,CATLG,DELETE),
-//            SPACE=(CYL,(1,1)),UNIT=SYSDA`
-  }
+//            SPACE=(CYL,(1,1)),UNIT=SYSDA`,
+  },
 }

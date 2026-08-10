@@ -1,16 +1,23 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { MonacoEditor } from '../components/editor/MonacoEditor'
 import { ValidationFeedback } from '../components/editor/ValidationFeedback'
-import { Play, Loader2, Code2, Server, Terminal, ChevronLeft } from 'lucide-react'
+import { Play, Loader2, Code2, Server, Terminal, ChevronLeft, FilePlus, Trash2, Upload } from 'lucide-react'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../components/ui/dialog'
+import { Input } from '../components/ui/input'
+import { Button } from '../components/ui/button'
 import { lintCOBOL } from '../lib/validation/cobolLinter'
 import { lintJCL } from '../lib/validation/jclLinter'
 import type { ValidationResult } from '../lib/validation/schemas'
 import { SAMPLE_PROGRAMS } from '../lib/constants'
+import { SyntaxSidebar } from '../components/layout/SyntaxSidebar'
+import { useWorkspace, type SavedFile } from '../hooks/useWorkspace'
 
 export const Route = createFileRoute('/syntax')({
   component: SyntaxChecker,
 })
+
+const MAX_FILES = 15
 
 function SyntaxChecker() {
   const [activeLang, setActiveLang] = useState<'cobol' | 'jcl'>('cobol')
@@ -18,10 +25,130 @@ function SyntaxChecker() {
 
   const [isPending, setIsPending] = useState(false)
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null)
+  
+  const { savedFiles, setSavedFiles, activeFileId, setActiveFileId } = useWorkspace()
+
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [isNewFileDialogOpen, setIsNewFileDialogOpen] = useState(false)
+  const [newFileName, setNewFileName] = useState('')
+
+  // Sync editor with active file when workspace restores or selection changes
+  useEffect(() => {
+    if (activeFileId) {
+      const activeFile = savedFiles.find(f => f.id === activeFileId)
+      if (activeFile) {
+        setCode(activeFile.code)
+        setActiveLang(activeFile.lang)
+      }
+    }
+  }, [activeFileId, savedFiles.length])
+
+  const handleCodeChange = (newCode: string) => {
+    setCode(newCode)
+    if (activeFileId) {
+      setSavedFiles(prev => prev.map(f => f.id === activeFileId ? { ...f, code: newCode } : f))
+    }
+  }
+
+  const handleLangChange = (lang: 'cobol' | 'jcl') => {
+    setActiveLang(lang)
+    setValidationResult(null)
+    if (activeFileId) {
+      setSavedFiles(prev => prev.map(f => f.id === activeFileId ? { ...f, lang } : f))
+    }
+  }
+
+  const handleOpenNewFileDialog = () => {
+    if (savedFiles.length >= MAX_FILES) {
+      alert(`Maximum of ${MAX_FILES} files reached. Please delete some files first.`)
+      return
+    }
+    setNewFileName('')
+    setIsNewFileDialogOpen(true)
+  }
+
+  const submitNewFile = () => {
+    if (!newFileName || newFileName.trim() === '') return
+    
+    const newFile: SavedFile = {
+      id: Math.random().toString(36).substring(2, 10),
+      name: newFileName.trim(),
+      lang: activeLang,
+      code: code || ''
+    }
+    setSavedFiles([...savedFiles, newFile])
+    setActiveFileId(newFile.id)
+    setValidationResult(null)
+    setIsNewFileDialogOpen(false)
+  }
+
+  const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (savedFiles.length >= MAX_FILES) {
+      alert(`Maximum of ${MAX_FILES} files reached. Please delete some files first.`)
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      const content = event.target?.result as string
+      let lang: 'cobol' | 'jcl' = 'cobol'
+      const name = file.name
+      
+      if (name.toLowerCase().endsWith('.jcl')) {
+        lang = 'jcl'
+      } else if (name.toLowerCase().endsWith('.cbl') || name.toLowerCase().endsWith('.cob')) {
+        lang = 'cobol'
+      } else {
+        if (content.split('\n')[0]?.startsWith('//')) {
+          lang = 'jcl'
+        }
+      }
+
+      const newFile: SavedFile = {
+        id: Math.random().toString(36).substring(2, 10),
+        name: name,
+        lang: lang,
+        code: content
+      }
+      setSavedFiles(prev => [...prev, newFile])
+      setActiveFileId(newFile.id)
+      setCode(content)
+      setActiveLang(lang)
+      setValidationResult(null)
+    }
+    reader.readAsText(file)
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  const handleDeleteFile = (id: string) => {
+    if (confirm('Are you sure you want to delete this file?')) {
+      setSavedFiles(prev => prev.filter(f => f.id !== id))
+      if (activeFileId === id) {
+        setActiveFileId(null)
+        setCode('')
+        setValidationResult(null)
+      }
+    }
+  }
+
+  const handleSelectFile = (file: SavedFile) => {
+    setActiveFileId(file.id)
+    setCode(file.code)
+    setActiveLang(file.lang)
+    setValidationResult(null)
+  }
 
   const handleSampleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value
-    if (val === 'custom') return
+    setActiveFileId(null)
+    if (val === 'custom') {
+      setCode('')
+      setValidationResult(null)
+      return
+    }
     const sample = SAMPLE_PROGRAMS[val as keyof typeof SAMPLE_PROGRAMS]
     setActiveLang(sample.lang as 'cobol' | 'jcl')
     setCode(sample.code)
@@ -48,7 +175,7 @@ function SyntaxChecker() {
         setValidationResult({
           success: diags.length === 0,
           diagnostics: diags,
-          output: diags.length === 0 ? "COMPILATION SUCCESSFUL.n0 WARNINGS, 0 ERRORS." : undefined
+          output: diags.length === 0 ? "COMPILATION SUCCESSFUL. 0 WARNINGS, 0 ERRORS." : undefined
         })
       }
     } catch (err) {
@@ -73,13 +200,13 @@ function SyntaxChecker() {
           
           <div className="flex bg-[#0d1317] rounded-lg p-1 border border-slate-800/60 shadow-inner">
             <button
-              onClick={() => { setActiveLang('cobol'); setValidationResult(null) }}
+              onClick={() => handleLangChange('cobol')}
               className={`px-5 py-1.5 text-sm font-medium rounded-md flex items-center gap-2 transition-all ${activeLang === 'cobol' ? 'bg-slate-800 shadow text-emerald-400' : 'text-slate-400 hover:text-slate-200'}`}
             >
               <Code2 size={16} /> COBOL
             </button>
             <button
-              onClick={() => { setActiveLang('jcl'); setValidationResult(null) }}
+              onClick={() => handleLangChange('jcl')}
               className={`px-5 py-1.5 text-sm font-medium rounded-md flex items-center gap-2 transition-all ${activeLang === 'jcl' ? 'bg-slate-800 shadow text-emerald-400' : 'text-slate-400 hover:text-slate-200'}`}
             >
               <Server size={16} /> JCL
@@ -111,15 +238,34 @@ function SyntaxChecker() {
         </button>
       </div>
 
-      <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative z-10">
-        {/* Editor */}
-        <div className="flex-[1.5] border-r border-slate-800/60 relative bg-[#0d1317]">
-          <MonacoEditor
-            language={activeLang}
-            value={code}
-            onChange={(val) => setCode(val || '')}
-          />
-        </div>
+      <div className="flex-1 flex flex-row overflow-hidden relative z-10">
+        <SyntaxSidebar
+          savedFiles={savedFiles}
+          activeFileId={activeFileId}
+          maxFiles={MAX_FILES}
+          onNewFile={handleOpenNewFileDialog}
+          onImportClick={() => fileInputRef.current?.click()}
+          onDeleteFile={handleDeleteFile}
+          onSelectFile={handleSelectFile}
+        />
+        <input 
+          type="file" 
+          ref={fileInputRef} 
+          onChange={handleImportFile} 
+          className="hidden" 
+          accept=".cbl,.cob,.jcl,.txt"
+        />
+
+        {/* Editor + Output Area */}
+        <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+          {/* Editor */}
+          <div className="flex-[1.5] border-r border-slate-800/60 relative bg-[#0d1317]">
+            <MonacoEditor
+              language={activeLang}
+              value={code}
+              onChange={(val) => handleCodeChange(val || '')}
+            />
+          </div>
 
         {/* Output Panel */}
         <div className="w-full md:flex-1 min-w-[400px] bg-[#080c0f] overflow-y-auto flex flex-col relative shadow-[-10px_0_30px_rgba(0,0,0,0.3)]">
@@ -154,7 +300,36 @@ function SyntaxChecker() {
             )}
           </div>
         </div>
+        </div>
       </div>
+      <Dialog open={isNewFileDialogOpen} onOpenChange={setIsNewFileDialogOpen}>
+        <DialogContent className="bg-[#0a0f12] border-slate-800 text-slate-200 sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Create New File</DialogTitle>
+            <DialogDescription className="text-slate-400">
+              Enter a name for your new file (e.g., TEST01.CBL).
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Input 
+              value={newFileName} 
+              onChange={(e) => setNewFileName(e.target.value)} 
+              placeholder="Filename..."
+              className="bg-[#0d1317] border-slate-700 text-slate-200 placeholder:text-slate-600 focus-visible:ring-emerald-500"
+              onKeyDown={(e) => e.key === 'Enter' && submitNewFile()}
+              autoFocus
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setIsNewFileDialogOpen(false)} className="text-slate-400 hover:text-slate-300 hover:bg-slate-800">
+              Cancel
+            </Button>
+            <Button onClick={submitNewFile} className="bg-emerald-600 hover:bg-emerald-500 text-white">
+              Create
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
