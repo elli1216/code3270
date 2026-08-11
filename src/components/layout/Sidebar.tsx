@@ -35,8 +35,8 @@ export function Sidebar() {
           </Link>
 
           {/* XP & Level HUD */}
-          <Link to="/leaderboard" className="bg-slate-900/50 border border-slate-800 p-3 rounded-xl hover:bg-slate-800/50 transition-colors group relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-colors" />
+          <div className="bg-slate-900/50 border border-slate-800 p-3 rounded-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/5 rounded-full blur-2xl transition-colors" />
             <div className="flex justify-between items-end mb-2 relative z-10">
               <div className="flex flex-col">
                 <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Mainframe Tech</span>
@@ -50,7 +50,7 @@ export function Sidebar() {
                 style={{ width: `${progressToNextLevel}%` }}
               />
             </div>
-          </Link>
+          </div>
         </div>
 
         <div className="flex-1 py-6 px-3 space-y-8">
