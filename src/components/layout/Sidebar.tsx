@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export function Sidebar() {
-  const { isLessonCompleted, resetProgress } = useProgressStore()
+  const { isLessonCompleted, resetProgress, xp } = useProgressStore()
   const search = useSearch({ strict: false })
   const router = useRouter()
   const [showResetModal, setShowResetModal] = useState(false)
@@ -14,19 +14,42 @@ export function Sidebar() {
   const handleReset = () => {
     resetProgress()
     setShowResetModal(false)
-    // Optional: reload or navigate to start
     router.navigate({ to: '/learn', search: { track: 'cobol', module: 'anatomy' } })
   }
+
+  // Gamification logic
+  const safeXp = xp || 0
+  const level = Math.floor(safeXp / 500) + 1
+  const xpInCurrentLevel = safeXp % 500
+  const progressToNextLevel = (xpInCurrentLevel / 500) * 100
 
   return (
     <>
       <aside className="w-[280px] border-r border-slate-800/60 bg-[#0a0f12] flex flex-col h-full overflow-y-auto hidden md:flex font-sans">
-        <div className="p-5 border-b border-slate-800/60 sticky top-0 bg-[#0a0f12]/95 backdrop-blur z-10 flex justify-between items-center">
+        <div className="p-5 border-b border-slate-800/60 sticky top-0 bg-[#0a0f12]/95 backdrop-blur z-10 flex flex-col gap-4">
           <Link to="/" className="flex items-center gap-2.5 group w-max">
             <div className="bg-emerald-500/10 p-1.5 rounded-md border border-emerald-500/20 group-hover:bg-emerald-500/20 transition-colors">
               <Terminal size={18} className="text-emerald-400" />
             </div>
             <span className="text-slate-100 group-hover:text-white transition-colors font-mono font-bold text-lg tracking-tight">Code3270</span>
+          </Link>
+
+          {/* XP & Level HUD */}
+          <Link to="/leaderboard" className="bg-slate-900/50 border border-slate-800 p-3 rounded-xl hover:bg-slate-800/50 transition-colors group relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-colors" />
+            <div className="flex justify-between items-end mb-2 relative z-10">
+              <div className="flex flex-col">
+                <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Mainframe Tech</span>
+                <span className="text-sm text-emerald-400 font-bold font-mono">Level {level}</span>
+              </div>
+              <span className="text-xs font-mono text-slate-400">{safeXp} XP</span>
+            </div>
+            <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden relative z-10">
+              <div
+                className="h-full bg-gradient-to-r from-emerald-600 to-emerald-400 rounded-full transition-all duration-1000 ease-out"
+                style={{ width: `${progressToNextLevel}%` }}
+              />
+            </div>
           </Link>
         </div>
 

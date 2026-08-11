@@ -43,13 +43,17 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
   shellComponent: RootDocument,
 })
 
+import { useThemeStore } from '../store/themeStore'
+
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const { isRetroMode } = useThemeStore()
+  
   return (
     <html lang="en">
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body className={isRetroMode ? 'theme-retro' : 'dark'}>
         {children}
         <TanStackDevtools
           config={{

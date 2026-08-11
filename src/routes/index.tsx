@@ -1,10 +1,13 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
-import { Terminal, Server, Code, ChevronRight, CheckCircle2 } from 'lucide-react'
+import { Terminal, Server, Code, ChevronRight, CheckCircle2, MonitorPlay } from 'lucide-react'
+import { useThemeStore } from '../store/themeStore'
 
 export const Route = createFileRoute('/')({ component: LandingPage })
 
 function LandingPage() {
+  const { isRetroMode, toggleRetroMode } = useThemeStore()
+
   return (
     <div className="min-h-screen bg-[#0a0f12] text-slate-200 selection:bg-emerald-500/30 overflow-hidden relative flex flex-col font-sans">
       {/* Background Elements */}
@@ -23,12 +26,23 @@ function LandingPage() {
             </div>
             <span className="text-slate-100 group-hover:text-white transition-colors">Code3270</span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={toggleRetroMode}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-colors border ${isRetroMode
+                ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.2)]'
+                : 'bg-slate-800/50 text-slate-400 border-slate-700/50 hover:bg-slate-800 hover:text-slate-300'
+                }`}
+            >
+              <MonitorPlay size={14} />
+              TN3270 Mode
+            </button>
+            <div className="h-5 w-px bg-slate-800 hidden md:block" />
             <Link
               to="/syntax"
-              className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-emerald-400 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-emerald-400 transition-colors hidden md:block"
             >
-              Syntax Checker
+              Sandbox
             </Link>
             <Link
               to="/learn"
@@ -48,7 +62,7 @@ function LandingPage() {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="text-center max-w-4xl mx-auto mb-20"
         >
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
@@ -59,7 +73,7 @@ function LandingPage() {
           </motion.div>
 
           <h1 className="text-5xl lg:text-7xl font-bold tracking-tight mb-8 text-white">
-            Master the Engines of <br /> 
+            Master the Engines of <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-200">
               Global Commerce
             </span>
@@ -75,9 +89,9 @@ function LandingPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               to="/learn"
-              className="group relative inline-flex items-center gap-3 px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-xl font-bold text-lg transition-all shadow-[0_0_30px_rgba(52,211,153,0.2)] hover:shadow-[0_0_50px_rgba(52,211,153,0.4)] overflow-hidden w-full sm:w-auto justify-center"
+              className="group relative inline-flex items-center gap-3 px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-xl font-bold text-lg transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] overflow-hidden w-full sm:w-auto justify-center"
             >
-              <span className="relative z-10">Launch Workspace</span>
+              Launch Workspace
               <ChevronRight size={20} className="relative z-10 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
@@ -160,7 +174,7 @@ function LandingPage() {
           </motion.div>
         </div>
       </main>
-      
+
       {/* Footer */}
       <footer className="w-full border-t border-slate-800/60 bg-[#0a0f12]/80 backdrop-blur-sm relative z-20">
         <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between text-slate-500 text-sm">

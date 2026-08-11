@@ -1,8 +1,10 @@
 import { Editor, useMonaco } from '@monaco-editor/react'
 import { useEffect, useState } from 'react'
-import { Download } from 'lucide-react'
+import { Download, AlignLeft } from 'lucide-react'
 import type { editor } from 'monaco-editor'
 import { COBOL_SPECS } from '../../lib/validation/constants'
+import { formatCOBOL } from '../../lib/formatter/cobolFormatter'
+import { useThemeStore } from '../../store/themeStore'
 
 interface MonacoEditorProps {
   language: 'cobol' | 'jcl' // Or standard languages if we don't have custom highlighters yet
@@ -43,6 +45,35 @@ export function MonacoEditor({ language, value, onChange, readOnly = false }: Mo
           'editorRuler.foreground': '#064e3b'
         }
       })
+
+      // IntelliSense: COBOL
+      monaco.languages.registerCompletionItemProvider('cobol', {
+        provideCompletionItems: (_model, _position) => {
+          const suggestions = [
+            { label: 'IDENTIFICATION DIVISION', kind: monaco.languages.CompletionItemKind.Keyword, insertText: '       IDENTIFICATION DIVISION.n       PROGRAM-ID. ' },
+            { label: 'ENVIRONMENT DIVISION', kind: monaco.languages.CompletionItemKind.Keyword, insertText: '       ENVIRONMENT DIVISION.n' },
+            { label: 'DATA DIVISION', kind: monaco.languages.CompletionItemKind.Keyword, insertText: '       DATA DIVISION.n       WORKING-STORAGE SECTION.n' },
+            { label: 'PROCEDURE DIVISION', kind: monaco.languages.CompletionItemKind.Keyword, insertText: '       PROCEDURE DIVISION.n' },
+            { label: 'PERFORM', kind: monaco.languages.CompletionItemKind.Keyword, insertText: 'PERFORM ' },
+            { label: 'DISPLAY', kind: monaco.languages.CompletionItemKind.Keyword, insertText: 'DISPLAY ' },
+            { label: 'STOP RUN', kind: monaco.languages.CompletionItemKind.Keyword, insertText: 'STOP RUN.' },
+          ]
+          return { suggestions: suggestions as any }
+        }
+      })
+
+      // IntelliSense: JCL
+      monaco.languages.registerCompletionItemProvider('jcl', {
+        provideCompletionItems: (_model, _position) => {
+          const suggestions = [
+            { label: 'JOB', kind: monaco.languages.CompletionItemKind.Keyword, insertText: "//MYJOB    JOB (ACCT),'NAME',CLASS=A,MSGCLASS=X" },
+            { label: 'EXEC PGM', kind: monaco.languages.CompletionItemKind.Keyword, insertText: "//STEP1    EXEC PGM=" },
+            { label: 'DD DSN', kind: monaco.languages.CompletionItemKind.Keyword, insertText: "//DD1      DD DSN=USER.DATA.SET,\n//            DISP=(NEW,CATLG,DELETE),\n//            SPACE=(TRK,(10,5))" },
+            { label: 'SYSOUT', kind: monaco.languages.CompletionItemKind.Keyword, insertText: "//SYSOUT   DD SYSOUT=*" },
+          ]
+          return { suggestions: suggestions as any }
+        }
+      })
     }
   }, [monaco])
 
@@ -66,15 +97,31 @@ export function MonacoEditor({ language, value, onChange, readOnly = false }: Mo
     URL.revokeObjectURL(url)
   }
 
+    const handleFormat = () => {
+      if (language === 'cobol') {
+        onChange(formatCOBOL(value))
+      }
+    }
+
+    const downloadTxtLabel = `Download as text file`
+    const downloadLangLabel = `Download as ${language.toUpperCase()} file`
+
+  const { isRetroMode } = useThemeStore()
+
   return (
     <div className="w-full h-full absolute inset-0 flex flex-col">
-      {/* Column Indicator and Cursor Tracker */}
+      {/* ... header ... */}
       <div className="h-8 shrink-0 bg-[#1e1e1e] border-b border-[#2d2d2d] flex items-center justify-end overflow-hidden pr-4 gap-3">
         <div className="flex items-center gap-2">
-          <button onClick={() => handleExport('txt')} className="flex items-center gap-1 text-[10px] uppercase font-bold text-emerald-500/70 hover:text-emerald-400 hover:bg-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 transition-colors" title="Download as text file">
+          {language === 'cobol' && !readOnly && (
+            <button onClick={handleFormat} className="flex items-center gap-1 text-[10px] uppercase font-bold text-emerald-500/70 hover:text-emerald-400 hover:bg-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 transition-colors" title="Format COBOL Code">
+              <AlignLeft size={12} /> Format
+            </button>
+          )}
+          <button onClick={() => handleExport('txt')} className="flex items-center gap-1 text-[10px] uppercase font-bold text-emerald-500/70 hover:text-emerald-400 hover:bg-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 transition-colors" title={downloadTxtLabel}>
             <Download size={12} /> .txt
           </button>
-          <button onClick={() => handleExport(language === 'cobol' ? 'cob' : 'jcl')} className="flex items-center gap-1 text-[10px] uppercase font-bold text-emerald-500/70 hover:text-emerald-400 hover:bg-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 transition-colors" title={`Download as ${language.toUpperCase()} file`}>
+          <button onClick={() => handleExport(language === 'cobol' ? 'cob' : 'jcl')} className="flex items-center gap-1 text-[10px] uppercase font-bold text-emerald-500/70 hover:text-emerald-400 hover:bg-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 transition-colors" title={downloadLangLabel}>
             <Download size={12} /> .{language === 'cobol' ? 'cob' : 'jcl'}
           </button>
         </div>
@@ -88,7 +135,7 @@ export function MonacoEditor({ language, value, onChange, readOnly = false }: Mo
           height="100%"
           defaultLanguage="plaintext"
           language={language}
-          theme="vs-dark"
+          theme={isRetroMode ? 'terminal-green' : 'vs-dark'}
           value={value}
           onChange={onChange}
           onMount={handleEditorMount}
