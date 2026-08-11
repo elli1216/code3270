@@ -33,7 +33,9 @@ function LearnWorkspace() {
   const navigate = useNavigate({ from: '/learn' })
   const currentLessonId = `${track}-${currentModuleId}`
   
-  const { getLessonCode, saveLessonCode, markLessonCompleted } = useProgressStore()
+  const getLessonCode = useProgressStore((state) => state.getLessonCode)
+  const saveLessonCode = useProgressStore((state) => state.saveLessonCode)
+  const markLessonCompleted = useProgressStore((state) => state.markLessonCompleted)
   const [code, setCode] = useState<string>(DEFAULT_CODE_MAP[track] || '')
   
   const [markdownContent, setMarkdownContent] = useState<string>("Loading lesson...")

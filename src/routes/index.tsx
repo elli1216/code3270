@@ -6,7 +6,8 @@ import { useThemeStore } from '../store/themeStore'
 export const Route = createFileRoute('/')({ component: LandingPage })
 
 function LandingPage() {
-  const { isRetroMode, toggleRetroMode } = useThemeStore()
+  const isRetroMode = useThemeStore((s) => s.isRetroMode)
+  const toggleRetroMode = useThemeStore((s) => s.toggleRetroMode)
 
   return (
     <div className="min-h-screen bg-[#0a0f12] text-slate-200 selection:bg-emerald-500/30 overflow-hidden relative flex flex-col font-sans">

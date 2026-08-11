@@ -9,7 +9,6 @@ interface LessonProgress {
 
 interface ProgressState {
   completedLessons: Record<string, LessonProgress>
-  xp: number
   markLessonCompleted: (lessonId: string, code?: string) => void
   saveLessonCode: (lessonId: string, code: string) => void
   isLessonCompleted: (lessonId: string) => boolean
@@ -21,13 +20,10 @@ export const useProgressStore = create<ProgressState>()(
   persist(
     (set, get) => ({
       completedLessons: {},
-      xp: 0,
-      resetProgress: () => set({ completedLessons: {}, xp: 0 }),
+      resetProgress: () => set({ completedLessons: {} }),
       
       markLessonCompleted: (lessonId, code) => set((state) => {
-        const isAlreadyCompleted = state.completedLessons[lessonId]?.completed
         return {
-          xp: isAlreadyCompleted ? state.xp : state.xp + 150,
           completedLessons: {
             ...state.completedLessons,
             [lessonId]: {

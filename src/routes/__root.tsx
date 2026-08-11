@@ -46,7 +46,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 import { useThemeStore } from '../store/themeStore'
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-  const { isRetroMode } = useThemeStore()
+  const isRetroMode = useThemeStore((s) => s.isRetroMode)
   
   return (
     <html lang="en">

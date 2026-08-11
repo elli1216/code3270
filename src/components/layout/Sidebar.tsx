@@ -6,7 +6,8 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export function Sidebar() {
-  const { isLessonCompleted, resetProgress, xp } = useProgressStore()
+  const isLessonCompleted = useProgressStore((state) => state.isLessonCompleted)
+  const resetProgress = useProgressStore((state) => state.resetProgress)
   const search = useSearch({ strict: false })
   const router = useRouter()
   const [showResetModal, setShowResetModal] = useState(false)
@@ -16,12 +17,6 @@ export function Sidebar() {
     setShowResetModal(false)
     router.navigate({ to: '/learn', search: { track: 'cobol', module: 'anatomy' } })
   }
-
-  // Gamification logic
-  const safeXp = xp || 0
-  const level = Math.floor(safeXp / 500) + 1
-  const xpInCurrentLevel = safeXp % 500
-  const progressToNextLevel = (xpInCurrentLevel / 500) * 100
 
   return (
     <>
@@ -33,24 +28,6 @@ export function Sidebar() {
             </div>
             <span className="text-slate-100 group-hover:text-white transition-colors font-mono font-bold text-lg tracking-tight">Code3270</span>
           </Link>
-
-          {/* XP & Level HUD */}
-          <div className="bg-slate-900/50 border border-slate-800 p-3 rounded-xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/5 rounded-full blur-2xl transition-colors" />
-            <div className="flex justify-between items-end mb-2 relative z-10">
-              <div className="flex flex-col">
-                <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Mainframe Tech</span>
-                <span className="text-sm text-emerald-400 font-bold font-mono">Level {level}</span>
-              </div>
-              <span className="text-xs font-mono text-slate-400">{safeXp} XP</span>
-            </div>
-            <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden relative z-10">
-              <div
-                className="h-full bg-gradient-to-r from-emerald-600 to-emerald-400 rounded-full transition-all duration-1000 ease-out"
-                style={{ width: `${progressToNextLevel}%` }}
-              />
-            </div>
-          </div>
         </div>
 
         <div className="flex-1 py-6 px-3 space-y-8">
