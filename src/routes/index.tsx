@@ -2,6 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
 import { Terminal, Server, Code, ChevronRight, CheckCircle2, MonitorPlay } from 'lucide-react'
 import { useThemeStore } from '../store/themeStore'
+import { HistorySection } from '../components/home/HistorySection'
 
 export const Route = createFileRoute('/')({ component: LandingPage })
 
@@ -174,6 +175,9 @@ function LandingPage() {
             </div>
           </motion.div>
         </div>
+
+        {/* Dynamic History Section */}
+        <HistorySection />
       </main>
 
       {/* Footer */}
