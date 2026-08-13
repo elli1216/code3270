@@ -33,7 +33,6 @@ To read these Return Codes, modern JCL allows you to wrap your `EXEC` steps insi
 //ELSE1   ELSE
 //STEP3     EXEC PGM=ERRORLOG
 //END1    ENDIF
-
 ```
 
 ### The Syntax Breakdown
@@ -44,16 +43,63 @@ To read these Return Codes, modern JCL allows you to wrap your `EXEC` steps insi
 
 ---
 
+## 3. Sample Program: Production Validation & Notification Pipeline
+
+Here is a complete, real-world conditional JCL script demonstrating error branches, fallback handling, and final status reporting:
+
+```jcl
+//CONDJOB  JOB (ACCT555),'ETL PIPELINE',CLASS=A,MSGCLASS=X
+//*----------------------------------------------------------------*
+//* STEP 1: EXTRACT & VALIDATE SOURCE DATA                         *
+//*----------------------------------------------------------------*
+//STEP1    EXEC PGM=IEFBR14
+//SYSPRINT DD  SYSOUT=*
+//*
+//*----------------------------------------------------------------*
+//* STEP 2: RUN TRANSFORM ONLY IF STEP1 COMPLETED WITH RC <= 4     *
+//*----------------------------------------------------------------*
+//IFOK     IF (STEP1.RC <= 4) THEN
+//STEP2      EXEC PGM=PROGB
+//INFILE     DD  DSN=PROD.VALID.DATA,DISP=SHR
+//OUTFILE    DD  DSN=PROD.TRANSFORMED.DATA,
+//               DISP=(NEW,CATLG,DELETE),
+//               SPACE=(CYL,(2,1)),
+//               UNIT=SYSDA
+//SYSPRINT   DD  SYSOUT=*
+//ELSE1    ELSE
+//*----------------------------------------------------------------*
+//* STEP 3: RUN EMERGENCY RECOVERY IF STEP1 FAILED (RC > 4)        *
+//*----------------------------------------------------------------*
+//STEP3      EXEC PGM=IEFBR14
+//ERRFILE    DD  DSN=PROD.ERROR.ALERT,
+//               DISP=(MOD,CATLG,DELETE),
+//               SPACE=(TRK,(1,1)),
+//               UNIT=SYSDA
+//ENDIF1   ENDIF
+```
+
+---
+
 ## 💻 Activity: The Gatekeeper
 
 Let's protect a sensitive job step. Imagine `STEP2` runs a critical database update (`PROGB`), and you absolutely do not want it to run unless `STEP1` (`IEFBR14`) was a flawless success.
 
 **Your tasks:**
 
-1. Assume you already have `//STEP1 EXEC PGM=IEFBR14` written in your editor.
-2. Directly below it, create an `IF` statement named `CHK1` (starting in column 3).
-3. Write the condition to check if `STEP1.RC` is exactly equal to `0`. Don't forget the `THEN` keyword!
+1. Create a `JOB` statement: `//GATEKEEP JOB (123),'TEST',CLASS=A,MSGCLASS=X`.
+2. Write step 1: `//STEP1 EXEC PGM=IEFBR14`.
+3. Directly below it, create an `IF` statement named `CHK1`: `//CHK1 IF (STEP1.RC = 0) THEN`.
 4. Inside the `IF` block, write your next step: `//STEP2 EXEC PGM=PROGB`.
-5. Close the block by writing an `ENDIF` statement named `END1`.
+5. Close the block by writing an `ENDIF` statement named `END1`: `//END1 ENDIF`.
+
+**Sample Code to Start With:**
+
+```jcl
+//GATEKEEP JOB (123),'TEST',CLASS=A,MSGCLASS=X
+//STEP1    EXEC PGM=IEFBR14
+//CHK1     IF (STEP1.RC = 0) THEN
+//STEP2    EXEC PGM=PROGB
+//END1     ENDIF
+```
 
 **⚠️ Warning:** Be careful with your spacing! The keywords `IF` and `ENDIF` are Operations, meaning they must be separated from their Name fields (`CHK1`, `END1`) by at least one space.

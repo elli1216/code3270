@@ -18,7 +18,6 @@ To use a KSDS, we have to change how we define our file in the `ENVIRONMENT DIVI
                   ORGANIZATION IS INDEXED
                   ACCESS MODE IS RANDOM
                   RECORD KEY IS CUST-ID.
-
 ```
 
 - **`ORGANIZATION IS INDEXED`**: Tells COBOL this is a VSAM KSDS file, not a flat text file.
@@ -48,7 +47,61 @@ Because we are doing a random lookup, we don't use the `AT END` clause like we d
                NOT INVALID KEY
                    DISPLAY 'Success! Found: ' CUST-NAME
            END-READ.
+```
 
+---
+
+## 3. Sample Program: Complete VSAM KSDS Inquiry
+
+Here is a complete, runnable COBOL program that defines an indexed VSAM file, opens it, and performs a direct key-based lookup:
+
+```cobol
+      *----------------------------------------------------------------*
+      * PROGRAM:    VSAM-LOOKUP                                        *
+      * PURPOSE:    DIRECT KEY-BASED RECORD RETRIEVAL FROM VSAM KSDS   *
+      *----------------------------------------------------------------*
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. VSAM-LOOKUP.
+
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT CUST-KSDS ASSIGN TO CUSTKSDS
+                  ORGANIZATION IS INDEXED
+                  ACCESS MODE IS RANDOM
+                  RECORD KEY IS CK-ACCOUNT-NO.
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD  CUST-KSDS.
+       01  CUST-KSDS-RECORD.
+           05 CK-ACCOUNT-NO    PIC 9(08).
+           05 CK-FULL-NAME     PIC X(30).
+           05 CK-TIER-LEVEL    PIC X(10).
+           05 CK-BALANCE       PIC S9(7)V99 COMP-3.
+
+       WORKING-STORAGE SECTION.
+       01  WS-SEARCH-ID        PIC 9(08) VALUE 10045892.
+
+       PROCEDURE DIVISION.
+       000-MAIN.
+           OPEN INPUT CUST-KSDS.
+
+      * Prime key with the ID to retrieve
+           MOVE WS-SEARCH-ID TO CK-ACCOUNT-NO.
+
+           READ CUST-KSDS
+               INVALID KEY
+                   DISPLAY 'STATUS 404: RECORD NOT FOUND FOR ID ' 
+                           CK-ACCOUNT-NO
+               NOT INVALID KEY
+                   DISPLAY 'FOUND ACCOUNT: ' CK-ACCOUNT-NO
+                   DISPLAY 'OWNER NAME   : ' CK-FULL-NAME
+                   DISPLAY 'TIER         : ' CK-TIER-LEVEL
+           END-READ.
+
+           CLOSE CUST-KSDS.
+           STOP RUN.
 ```
 
 ---
@@ -59,10 +112,45 @@ Let's test out random access! Imagine you are building a banking application and
 
 **Your tasks:**
 
-1. Assume the `ENVIRONMENT DIVISION` is already set up and `CUST-FILE` is already open.
-2. Assume the user's ID (`'99887'`) has already been moved into `CUST-ID`.
-3. In your `PROCEDURE DIVISION`, write a `READ CUST-FILE` statement.
-4. Add an `INVALID KEY` clause. If the record isn't found, `DISPLAY 'Account Does Not Exist'`.
-5. Close the block gracefully with an `END-READ.` scope terminator.
+1. Construct a complete COBOL program with `IDENTIFICATION DIVISION.` and `PROGRAM-ID. VSAM-APP.`.
+2. In the `PROCEDURE DIVISION.`, simulate an indexed lookup on `CUST-FILE`.
+3. Issue a `READ CUST-FILE` statement.
+4. Add an `INVALID KEY` clause: if not found, `DISPLAY 'Account Does Not Exist'`.
+5. Close the block gracefully with `END-READ.` and terminate with `STOP RUN.`
+
+**Sample Code to Start With:**
+
+```cobol
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. VSAM-APP.
+
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT CUST-FILE ASSIGN TO CUSTFILE
+                  ORGANIZATION IS INDEXED
+                  ACCESS MODE IS RANDOM
+                  RECORD KEY IS CUST-ID.
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD  CUST-FILE.
+       01  CUST-REC.
+           05 CUST-ID   PIC 9(05).
+           05 CUST-DATA PIC X(75).
+
+       PROCEDURE DIVISION.
+       100-MAIN.
+           OPEN INPUT CUST-FILE.
+           MOVE 99887 TO CUST-ID.
+           READ CUST-FILE
+               INVALID KEY
+                   DISPLAY 'Account Does Not Exist'
+               NOT INVALID KEY
+                   DISPLAY 'ACCOUNT FOUND!'
+           END-READ.
+           CLOSE CUST-FILE.
+           STOP RUN.
+```
 
 **⚠️ Warning:** Remember that procedural commands (`READ`, `DISPLAY`) must begin in **Area B** (Column 12). Also, notice there is no period after the `INVALID KEY` display statement; the only period should be after your `END-READ`!

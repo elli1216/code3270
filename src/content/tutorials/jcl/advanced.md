@@ -41,10 +41,41 @@ Using a GDG looks exactly like using a normal dataset, except for the relative n
 //             DISP=(NEW,CATLG,DELETE),
 //             SPACE=(CYL,(5,1)),
 //             DCB=(RECFM=FB,LRECL=80)
-
 ```
 
 _(Notice the `DISP=(NEW,CATLG,DELETE)` on the `+1` dataset. The `CATLG` parameter is what officially registers this new file into the GDG tracking system upon success!)_
+
+---
+
+## 3. Sample Program: Complete GDG Creation & Batch Roll
+
+Here is a complete JCL job illustrating how a GDG index base is configured and consumed:
+
+```jcl
+//GDGBATCH JOB (ACCT888),'GDG PROCESSING',CLASS=A,MSGCLASS=X
+//*----------------------------------------------------------------*
+//* STEP 1: DEFINE THE GDG BASE MODEL (IF FIRST TIME SETUP)        *
+//*----------------------------------------------------------------*
+//DEFGDG   EXEC PGM=IDCAMS
+//SYSPRINT DD  SYSOUT=*
+//SYSIN    DD  *
+  DEFINE GDG (NAME(PROD.DAILY.TRANS) -
+         LIMIT(7) -
+         NOEMPTY -
+         SCRATCH)
+/*
+//*----------------------------------------------------------------*
+//* STEP 2: PROCESS YESTERDAY'S (0) FILE AND GENERATE TODAY'S (+1) *
+//*----------------------------------------------------------------*
+//STEP2    EXEC PGM=IEFBR14
+//OLDDATA  DD  DSN=PROD.DAILY.TRANS(0),DISP=SHR
+//NEWDATA  DD  DSN=PROD.DAILY.TRANS(+1),
+//             DISP=(NEW,CATLG,DELETE),
+//             SPACE=(CYL,(5,2)),
+//             UNIT=SYSDA,
+//             DCB=(RECFM=FB,LRECL=80,BLKSIZE=0)
+//SYSPRINT DD  SYSOUT=*
+```
 
 ---
 
@@ -54,9 +85,20 @@ Let's write a `DD` statement to allocate tomorrow's batch file. Imagine your com
 
 **Your tasks:**
 
-1. Create a `DD` statement named `NEWDATA` starting in column 3.
-2. In the operand field, set the Dataset Name (`DSN=`) to `PROD.DAILY.TRANS`.
-3. Append the relative number to create a new generation `(+1)` directly to the dataset name with no spaces.
+1. Create a `JOB` and `EXEC` statement: `//GDGJOB JOB (123),'GDG',CLASS=A,MSGCLASS=X` and `//STEP1 EXEC PGM=IEFBR14`.
+2. Create a `DD` statement named `NEWDATA` starting in column 3.
+3. In the operand field, set the Dataset Name (`DSN=`) to `PROD.DAILY.TRANS(+1)`.
 4. Add a comma, and set the Disposition (`DISP=`) to `(NEW,CATLG,DELETE)`.
+
+**Sample Code to Start With:**
+
+```jcl
+//GDGJOB   JOB (123),'GDG',CLASS=A,MSGCLASS=X
+//STEP1    EXEC PGM=IEFBR14
+//NEWDATA  DD  DSN=PROD.DAILY.TRANS(+1),
+//             DISP=(NEW,CATLG,DELETE),
+//             SPACE=(CYL,(1,1)),
+//             UNIT=SYSDA
+```
 
 **⚠️ Warning:** Remember the strict JCL spacing rules! There must be a space between `NEWDATA`, `DD`, and the `DSN` parameter, but absolutely **no spaces** inside the parameter list (between the DSN and the DISP)!

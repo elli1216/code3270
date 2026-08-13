@@ -14,7 +14,7 @@ import { loadTutorialContentFn } from '../hooks/useTutorialLoader'
 import { lintJCL } from '../lib/validation/jclLinter'
 import type { ValidationResult } from '../lib/validation/schemas'
 import { validateActivity } from '../lib/validation/activityValidator'
-import { DEFAULT_CODE_MAP } from '../lib/constants'
+import { DEFAULT_CODE_MAP, MODULE_STARTER_CODES, MODULE_SOLUTION_CODES } from '../lib/constants'
 import { z } from 'zod'
 
 const searchSchema = z.object({
@@ -36,7 +36,9 @@ function LearnWorkspace() {
   const getLessonCode = useProgressStore((state) => state.getLessonCode)
   const saveLessonCode = useProgressStore((state) => state.saveLessonCode)
   const markLessonCompleted = useProgressStore((state) => state.markLessonCompleted)
-  const [code, setCode] = useState<string>(DEFAULT_CODE_MAP[track] || '')
+  const [code, setCode] = useState<string>(
+    MODULE_STARTER_CODES[currentLessonId] || DEFAULT_CODE_MAP[track] || ''
+  )
   
   const [markdownContent, setMarkdownContent] = useState<string>("Loading lesson...")
   const [isPending, setIsPending] = useState(false)
@@ -60,7 +62,7 @@ function LearnWorkspace() {
     if (saved) {
       setCode(saved)
     } else {
-      setCode(DEFAULT_CODE_MAP[track] || '')
+      setCode(MODULE_STARTER_CODES[currentLessonId] || DEFAULT_CODE_MAP[track] || '')
     }
     
     return () => { isMounted = false }
@@ -160,6 +162,8 @@ function LearnWorkspace() {
             isRunning={isPending}
             hasNext={hasNext}
             hasPrev={hasPrev}
+            solutionCode={MODULE_SOLUTION_CODES[currentLessonId]}
+            onApplySolution={(sol) => handleEditorChange(sol)}
           />
             
           {validationResult && (

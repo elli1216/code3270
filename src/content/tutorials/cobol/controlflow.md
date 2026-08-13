@@ -20,7 +20,6 @@ The `IF` statement works exactly as you would expect. You can use standard mathe
            ELSE
                DISPLAY 'Normal Balance'
            END-IF.
-
 ```
 
 ---
@@ -42,7 +41,6 @@ A very common pattern is **`EVALUATE TRUE`**, which acts like a clean, readable 
                WHEN OTHER
                    DISPLAY 'Status: Senior'
            END-EVALUATE.
-
 ```
 
 _Notice the `WHEN OTHER` clause? This is your default fallback, catching anything that doesn't match the prior conditions._
@@ -65,10 +63,59 @@ For iterating over code, we use **Inline Loops**. The `PERFORM VARYING` construc
            PERFORM VARYING WS-COUNTER FROM 1 BY 1 UNTIL WS-COUNTER > 10
                DISPLAY 'Current Count is: ' WS-COUNTER
            END-PERFORM.
-
 ```
 
-_(Remember: COBOL does not allow you to invent variables on the fly. You must declare your loop counter in the `DATA DIVISION` before you can use it in a `PERFORM` statement!)_
+---
+
+## 4. Sample Program: Customer Evaluation Engine
+
+Here is a complete, runnable COBOL program showing `IF-ELSE`, `EVALUATE`, and `PERFORM` loops working together:
+
+```cobol
+      *----------------------------------------------------------------*
+      * PROGRAM:    CONTROL-FLOW-DEMO                                  *
+      * PURPOSE:    DEMONSTRATE IF, EVALUATE, AND PERFORM CONSTRUCTS   *
+      *----------------------------------------------------------------*
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. CONTROL-FLOW-DEMO.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01  WS-SCORE        PIC 9(03) VALUE 85.
+       01  WS-GRADE        PIC X(01).
+       01  WS-INDEX        PIC 9(02) VALUE 1.
+
+       PROCEDURE DIVISION.
+       000-MAIN.
+      * 1. EVALUATE Decision Matrix
+           EVALUATE TRUE
+               WHEN WS-SCORE >= 90
+                   MOVE 'A' TO WS-GRADE
+               WHEN WS-SCORE >= 80
+                   MOVE 'B' TO WS-GRADE
+               WHEN WS-SCORE >= 70
+                   MOVE 'C' TO WS-GRADE
+               WHEN OTHER
+                   MOVE 'F' TO WS-GRADE
+           END-EVALUATE.
+
+           DISPLAY 'SCORE: ' WS-SCORE ' -> GRADE: ' WS-GRADE.
+
+      * 2. IF-ELSE Statement with explicit terminator
+           IF WS-GRADE = 'A' OR WS-GRADE = 'B'
+               DISPLAY 'STATUS: PASSED WITH HONORS'
+           ELSE
+               DISPLAY 'STATUS: REGULAR PASS/FAIL'
+           END-IF.
+
+      * 3. PERFORM Loop
+           DISPLAY '--- PRINTING ITERATIONS ---'.
+           PERFORM VARYING WS-INDEX FROM 1 BY 1 UNTIL WS-INDEX > 3
+               DISPLAY 'RUNNING STEP #' WS-INDEX
+           END-PERFORM.
+
+           STOP RUN.
+```
 
 ---
 
@@ -78,12 +125,29 @@ Let's test your iteration skills. In the editor on the right, write a complete p
 
 **Your tasks:**
 
-1. Setup your `IDENTIFICATION DIVISION` with a `PROGRAM-ID`.
+1. Setup your `IDENTIFICATION DIVISION` with a `PROGRAM-ID. LOOP-APP.`.
 2. Create a `DATA DIVISION` and a `WORKING-STORAGE SECTION`.
-3. Define a numeric variable to act as your loop counter (e.g., `01 WS-LOOP-COUNT PIC 9 VALUE 1.`).
-4. In your `PROCEDURE DIVISION`, write a `PERFORM VARYING` loop.
-5. Configure the loop to start at 1 and stop when your counter is **greater than 5**.
-6. Inside the loop, `DISPLAY 'Hello from COBOL!'`.
-7. End your program properly with `STOP RUN.`
+3. Define a numeric variable to act as your loop counter: `01 WS-LOOP-COUNT PIC 9 VALUE 1.`.
+4. In your `PROCEDURE DIVISION`, write a `PERFORM 5 TIMES` loop (or `PERFORM VARYING WS-LOOP-COUNT FROM 1 BY 1 UNTIL WS-LOOP-COUNT > 5`).
+5. Inside the loop, `DISPLAY 'Hello from COBOL!'`.
+6. End your program properly with `STOP RUN.`
+
+**Sample Code to Start With:**
+
+```cobol
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. LOOP-APP.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 WS-LOOP-COUNT PIC 9 VALUE 1.
+
+       PROCEDURE DIVISION.
+       100-MAIN.
+           PERFORM 5 TIMES
+               DISPLAY 'Hello from COBOL!'
+           END-PERFORM.
+           STOP RUN.
+```
 
 **⚠️ Warning:** Watch your margins! Your `01` variable must start in Area A (Column 8), while your `PERFORM` and `DISPLAY` statements must start in Area B (Column 12).

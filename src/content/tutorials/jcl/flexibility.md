@@ -31,28 +31,36 @@ When injecting variables into dataset names, you will often see two periods in a
 - The **second period** is the literal text character that gets placed into the dataset name.
 - If `&ENV` equals `PROD`, `&ENV..DATA` resolves perfectly to `PROD.DATA`.
 
-### Sample Code: The Complete Flow
+---
 
-Here is how an Instream PROC looks from definition to execution:
+## 3. Sample Program: Complete Instream PROC with Overrides
+
+Here is a complete, runnable JCL script defining a reusable backup procedure and calling it multiple times across environments:
 
 ```jcl
-//MYJOB    JOB (12345),'PROC TEST',CLASS=A,MSGCLASS=X
-//* ----------------------------------------------------
-//* 1. DEFINE THE INSTREAM PROC (The Component)
-//* ----------------------------------------------------
-//MYPROC   PROC ENV='DEV'
-//STEP1    EXEC PGM=MYPGM
-//FILE1    DD  DSN=APP.&ENV..DATA,DISP=SHR
+//PROCJOB  JOB (ACCT777),'PROC DEMO',CLASS=A,MSGCLASS=X
+//*----------------------------------------------------------------*
+//* 1. DEFINE REUSABLE INSTREAM PROC COMPONENT                     *
+//*----------------------------------------------------------------*
+//BACKUP   PROC ENV='DEV',LVL='DAILY'
+//COPYSTEP EXEC PGM=IEBGENER
+//SYSPRINT DD  SYSOUT=*
+//SYSIN    DD  DUMMY
+//SYSUT1   DD  DSN=CORP.&ENV..MASTER.&LVL,DISP=SHR
+//SYSUT2   DD  DSN=CORP.&ENV..BACKUP.&LVL,
+//             DISP=(NEW,CATLG,DELETE),
+//             SPACE=(CYL,(10,5)),
+//             UNIT=SYSDA
 //         PEND
-//* ----------------------------------------------------
-//* 2. EXECUTE THE PROC (Passing the Props)
-//* ----------------------------------------------------
-//* This will run using the default 'DEV'
-//RUNDEV   EXEC MYPROC
+//*----------------------------------------------------------------*
+//* 2. RUN WITH DEFAULT PARAMETERS (ENV=DEV, LVL=DAILY)            *
+//*----------------------------------------------------------------*
+//STEP1    EXEC BACKUP
 //*
-//* This will override the variable to 'PROD'
-//RUNPROD  EXEC MYPROC,ENV='PROD'
-
+//*----------------------------------------------------------------*
+//* 3. RUN WITH OVERRIDDEN PARAMETERS (ENV=PROD, LVL=WEEKLY)       *
+//*----------------------------------------------------------------*
+//STEP2    EXEC BACKUP,ENV='PROD',LVL='WEEKLY'
 ```
 
 ---
@@ -63,9 +71,20 @@ Let's package up the `IEBGENER` utility we learned about earlier into a reusable
 
 **Your tasks:**
 
-1. Define an Instream PROC named `BACKUP`. (Start in column 3).
-2. On the `PROC` statement, define a symbolic parameter named `LVL` and set its default value to `'DAILY'`. (e.g., `LVL='DAILY'`).
-3. Inside the PROC, create an `EXEC` step named `COPY` that runs `PGM=IEBGENER`.
-4. Close the block with a `PEND` statement (leave the name field blank, starting `PEND` in column 10 is standard).
+1. Create a `JOB` statement: `//FLEXJOB JOB (123),'PROC',CLASS=A,MSGCLASS=X`.
+2. Define an Instream PROC named `BACKUP` starting in column 3.
+3. On the `PROC` statement, define a symbolic parameter named `LVL` and set its default value to `'DAILY'`: `//BACKUP PROC LVL='DAILY'`.
+4. Inside the PROC, create an `EXEC` step named `COPY` that runs `PGM=IEBGENER`: `//COPY EXEC PGM=IEBGENER`.
+5. Close the block with a `PEND` statement: `// PEND` (or `//PEND PEND`).
+
+**Sample Code to Start With:**
+
+```jcl
+//FLEXJOB  JOB (123),'PROC',CLASS=A,MSGCLASS=X
+//BACKUP   PROC LVL='DAILY'
+//COPY     EXEC PGM=IEBGENER
+//         PEND
+//RUN1     EXEC BACKUP
+```
 
 **⚠️ Warning:** Do not forget the `PEND` statement! If you leave it off, JCL will think the rest of your script is still part of the definition, and your procedure will never actually run!

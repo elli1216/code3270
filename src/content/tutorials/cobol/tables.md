@@ -19,7 +19,6 @@ Usually, a Table is set up as a "Group Item". You define a top-level `01` header
        WORKING-STORAGE SECTION.
        01  MONTH-TABLE.
            05 MONTH-NAME PIC X(10) OCCURS 12 TIMES.
-
 ```
 
 _In this example, we just carved out 120 bytes of contiguous memory (12 slots × 10 characters each). To access the first month, you would write `MONTH-NAME(1)`._
@@ -40,10 +39,48 @@ To use the built-in `SEARCH` commands, COBOL needs a dedicated pointer (an index
 ```cobol
        01  MONTH-TABLE.
            05 MONTH-NAME PIC X(10) OCCURS 12 TIMES INDEXED BY MONTH-IDX.
-
 ```
 
 _(Fun Fact: Notice how `MONTH-IDX` doesn't have a `PIC` clause? `INDEXED BY` creates a special, hidden binary variable managed entirely by the compiler for maximum speed!)_
+
+---
+
+## 3. Sample Program: Department Roster Table
+
+Here is a complete, working COBOL program demonstrating how to define, initialize, populate, and iterate through a table:
+
+```cobol
+      *----------------------------------------------------------------*
+      * PROGRAM:    TABLE-DEMO                                         *
+      * PURPOSE:    DEMONSTRATE OCCURS TABLES AND INDEXING             *
+      *----------------------------------------------------------------*
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. TABLE-DEMO.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+      * Define a table with 3 employee slots
+       01  WS-DEPT-ROSTER.
+           05 WS-EMP-NAME     PIC X(15) OCCURS 3 TIMES.
+
+       01  WS-SUB             PIC 9(02) VALUE 1.
+
+       PROCEDURE DIVISION.
+       000-MAIN.
+      * Populate table slots using 1-based index
+           MOVE 'ALICE JOHNSON' TO WS-EMP-NAME(1).
+           MOVE 'BOB MARTINEZ'  TO WS-EMP-NAME(2).
+           MOVE 'CHARLIE DAVIS' TO WS-EMP-NAME(3).
+
+           DISPLAY '--- DEPARTMENT ROSTER ---'.
+
+      * Loop through table elements
+           PERFORM VARYING WS-SUB FROM 1 BY 1 UNTIL WS-SUB > 3
+               DISPLAY 'EMPLOYEE #' WS-SUB ': ' WS-EMP-NAME(WS-SUB)
+           END-PERFORM.
+
+           STOP RUN.
+```
 
 ---
 
@@ -53,9 +90,31 @@ Let's allocate a simple table and assign a value to it.
 
 **Your tasks:**
 
-1. In the `WORKING-STORAGE SECTION`, create a top-level group item named `01 WORK-WEEK.`.
-2. Underneath it, create the repeating table element: `05 DAYS PIC X(10) OCCURS 5 TIMES.`
-3. Drop down into the `PROCEDURE DIVISION`.
-4. Write a statement to move the text `'MONDAY'` into the very first slot of your new table. _(Hint: Use parentheses for the index!)_
+1. Create your `IDENTIFICATION DIVISION` with `PROGRAM-ID. TABLE-APP.`.
+2. In the `DATA DIVISION` and `WORKING-STORAGE SECTION`, create a top-level group item named `01 WORK-WEEK.`.
+3. Underneath it, create the repeating table element: `05 DAYS PIC X(10) OCCURS 5 TIMES.`
+4. Drop down into the `PROCEDURE DIVISION.`
+5. Write a statement to `MOVE 'MONDAY' TO DAYS(1).`
+6. `DISPLAY DAYS(1)` and finish with `STOP RUN.`
+
+**Sample Code to Start With:**
+
+```cobol
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. TABLE-APP.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 WORK-WEEK.
+          05 DAYS PIC X(10) OCCURS 5 TIMES.
+
+       PROCEDURE DIVISION.
+       100-MAIN.
+           MOVE 'MONDAY' TO DAYS(1).
+           MOVE 'TUESDAY' TO DAYS(2).
+           DISPLAY 'FIRST DAY: ' DAYS(1).
+           DISPLAY 'SECOND DAY: ' DAYS(2).
+           STOP RUN.
+```
 
 **⚠️ Warning:** Remember your column rules! The `01` level goes in **Area A** (Column 8), but the `05` level and your `PROCEDURE DIVISION` logic (`MOVE`) must go in **Area B** (Column 12). And don't forget your periods `.` at the end of your declarations!

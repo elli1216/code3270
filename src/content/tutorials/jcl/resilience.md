@@ -14,7 +14,6 @@ To solve this, JCL allows you to modify the master `JOB` statement at the very t
 
 ```jcl
 //MYJOB    JOB (12345),'NIGHTLY BATCH',CLASS=A,RESTART=STEP45
-
 ```
 
 _When you submit this job, the system will scan past steps 1 through 44, do nothing, and immediately begin executing `STEP45`._
@@ -25,7 +24,6 @@ What if the job failed inside a reusable Procedure (PROC)? If `STEP45` calls a P
 
 ```jcl
 //MYJOB    JOB (12345),'RESTART TEST',RESTART=STEP45.PROCSTP2
-
 ```
 
 _This tells the system: "Go to `STEP45`, look inside the PROC it is calling, and resume execution at `PROCSTP2`."_
@@ -40,6 +38,42 @@ If a step failed halfway through writing to a file, that file is now half-full o
 
 ---
 
+## 3. Sample Program: Production Job with Restart & Cleanup Step
+
+Here is a complete, multi-step JCL script configured to safely recover and resume at `STEP2`:
+
+```jcl
+//RECOVJOB JOB (ACCT333),'RECOVERY RUN',
+//             CLASS=A,
+//             MSGCLASS=X,
+//             RESTART=STEP2
+//*----------------------------------------------------------------*
+//* STEP 1: EXTRACT INITIAL DATA (SKIPPED BY SYSTEM ON RESTART)    *
+//*----------------------------------------------------------------*
+//STEP1    EXEC PGM=IEFBR14
+//OUT1     DD  DSN=PROD.TEMP.EXTRACT,
+//             DISP=(NEW,CATLG,DELETE),
+//             SPACE=(TRK,(5,2)),
+//             UNIT=SYSDA
+//*----------------------------------------------------------------*
+//* STEP 2: RESUME POINT - CLEANUP WORK DATASET & REPROCESS        *
+//*----------------------------------------------------------------*
+//STEP2    EXEC PGM=IEFBR14
+//CLEANUP  DD  DSN=PROD.BATCH.OUTPUT,
+//             DISP=(MOD,DELETE,DELETE),
+//             SPACE=(TRK,0)
+//*----------------------------------------------------------------*
+//* STEP 3: FINAL REPORTING STEP                                   *
+//*----------------------------------------------------------------*
+//STEP3    EXEC PGM=IEFBR14
+//REPORT   DD  DSN=PROD.FINAL.REPORT,
+//             DISP=(NEW,CATLG,DELETE),
+//             SPACE=(CYL,(1,1)),
+//             UNIT=SYSDA
+```
+
+---
+
 ## 💻 Activity: The Skip Forward
 
 Let's practice bypassing successful steps. Imagine you have a JCL script with three steps (`STEP1`, `STEP2`, and `STEP3`). `STEP1` ran successfully, but `STEP2` crashed. You have fixed the error and are ready to resume.
@@ -48,7 +82,15 @@ Let's practice bypassing successful steps. Imagine you have a JCL script with th
 
 1. Assume your original `JOB` statement looks like this:
    `//NIGHTLY  JOB (999),'USER',CLASS=A,MSGCLASS=X`
-2. Modify that `JOB` statement by adding the `RESTART` parameter to the end of the parameter list.
-3. Set the restart value so the system completely skips `STEP1` and begins execution directly at `STEP2`.
+2. Modify that `JOB` statement by adding the `RESTART=STEP2` parameter to the end of the parameter list.
+3. Write steps `//STEP1 EXEC PGM=IEFBR14` and `//STEP2 EXEC PGM=IEFBR14`.
+
+**Sample Code to Start With:**
+
+```jcl
+//NIGHTLY  JOB (999),'USER',CLASS=A,MSGCLASS=X,RESTART=STEP2
+//STEP1    EXEC PGM=IEFBR14
+//STEP2    EXEC PGM=IEFBR14
+```
 
 **⚠️ Warning:** Remember that the `RESTART` parameter belongs in the Operand field of the `JOB` statement. Ensure it is separated from the previous parameters by a comma, with absolutely **no spaces** in the parameter list!

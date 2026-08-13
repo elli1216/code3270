@@ -20,7 +20,6 @@ Then, in any program that needs that data, you just do this:
        WORKING-STORAGE SECTION.
        01  WS-CUSTOMER-DATA.
            COPY 'CUSTREC'.
-
 ```
 
 _Boom! All 500 variables are instantly available in your program._
@@ -46,7 +45,61 @@ Crucially, the subprogram does not create new memory for these variables; it dir
            * Calling an external compiled program named CALCTAX
            * We are passing it two variables from our Working-Storage
            CALL 'CALCTAX' USING IN-AMOUNT, OUT-TAX.
+```
 
+---
+
+## 3. Sample Program: Main Caller & Subprogram Pair
+
+Here is a complete pair of COBOL programs showing how the calling program and the called subprogram communicate:
+
+### Main Calling Program (`MAINPROG`)
+
+```cobol
+      *----------------------------------------------------------------*
+      * PROGRAM:    MAINPROG                                           *
+      * PURPOSE:    CALL SUBPROGRAM AND PRINT RETURNED VALUES          *
+      *----------------------------------------------------------------*
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. MAINPROG.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01  WS-PRICE        PIC 9(05)V99 VALUE 00100.00.
+       01  WS-TAX-RATE     PIC V99      VALUE .08.
+       01  WS-TOTAL-TAX    PIC 9(05)V99 VALUE 0.
+
+       PROCEDURE DIVISION.
+       000-MAIN.
+           DISPLAY 'CALLING SUBPROGRAM TAXCALC...'.
+
+           CALL 'TAXCALC' USING WS-PRICE, WS-TAX-RATE, WS-TOTAL-TAX.
+
+           DISPLAY 'BASE PRICE : $' WS-PRICE.
+           DISPLAY 'CALCULATED TAX: $' WS-TOTAL-TAX.
+           STOP RUN.
+```
+
+### Called Subprogram (`TAXCALC`)
+
+```cobol
+      *----------------------------------------------------------------*
+      * PROGRAM:    TAXCALC                                            *
+      * PURPOSE:    RECEIVE DATA VIA LINKAGE AND RETURN RESULT         *
+      *----------------------------------------------------------------*
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. TAXCALC.
+
+       DATA DIVISION.
+       LINKAGE SECTION.
+       01  LS-PRICE        PIC 9(05)V99.
+       01  LS-TAX-RATE     PIC V99.
+       01  LS-TOTAL-TAX    PIC 9(05)V99.
+
+       PROCEDURE DIVISION USING LS-PRICE, LS-TAX-RATE, LS-TOTAL-TAX.
+       000-COMPUTE-TAX.
+           MULTIPLY LS-PRICE BY LS-TAX-RATE GIVING LS-TOTAL-TAX.
+           GOBACK.
 ```
 
 ---
@@ -57,8 +110,28 @@ Let's wire up a module. Imagine you are building a financial dashboard and need 
 
 **Your tasks:**
 
-1. Assume you already have two variables, `NUM1` and `NUM2`, defined in your `WORKING-STORAGE SECTION`.
-2. Inside your `PROCEDURE DIVISION`, write the command to trigger an external program named `'MATHPROG'`.
-3. Pass both `NUM1` and `NUM2` to the external program using the `USING` clause.
+1. Create `IDENTIFICATION DIVISION` with `PROGRAM-ID. MODULAR-APP.`.
+2. In `WORKING-STORAGE SECTION`, define two numeric variables: `01 NUM1 PIC 9(4) VALUE 200.` and `01 NUM2 PIC 9(4) VALUE 50.`.
+3. Inside your `PROCEDURE DIVISION`, write the command to trigger an external program named `'MATHPROG'`.
+4. Pass both `NUM1` and `NUM2` to the external program using the `USING` clause: `CALL 'MATHPROG' USING NUM1, NUM2.`
+5. End with `STOP RUN.`
+
+**Sample Code to Start With:**
+
+```cobol
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. MODULAR-APP.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 NUM1 PIC 9(4) VALUE 200.
+       01 NUM2 PIC 9(4) VALUE 50.
+
+       PROCEDURE DIVISION.
+       100-MAIN.
+           CALL 'MATHPROG' USING NUM1, NUM2.
+           DISPLAY 'CALCULATION COMPLETE'.
+           STOP RUN.
+```
 
 **⚠️ Warning:** The `CALL` statement is an executable command, which means it must begin in **Area B** (Column 12)! Furthermore, the name of the external program you are calling must be enclosed in quotes if it is a literal string.

@@ -8,10 +8,40 @@ export interface ActivityRule {
   customValidator?: (code: string) => { valid: boolean; message?: string } | null;
 }
 
+export function stripComments(track: string, code: string): string {
+  const lines = code.split('\n')
+  if (track === 'cobol') {
+    return lines
+      .filter((line) => {
+        // In standard COBOL, comments start with * or / in Column 7 (0-indexed 6)
+        if (line.length >= 7 && (line[6] === '*' || line[6] === '/')) {
+          return false
+        }
+        const trimmed = line.trim()
+        if (trimmed.startsWith('*') || trimmed.startsWith('/')) {
+          return false
+        }
+        return true
+      })
+      .join('\n')
+  } else if (track === 'jcl') {
+    return lines
+      .filter((line) => {
+        const trimmed = line.trimStart()
+        if (trimmed.startsWith('//*')) {
+          return false
+        }
+        return true
+      })
+      .join('\n')
+  }
+  return code
+}
+
 export const ACTIVITY_RULES: Record<string, ActivityRule> = {
   // --- JCL Track ---
   'jcl-foundations': {
-    requiredKeywords: ['JOB', 'EXEC', 'DD', 'PGM=IEFBR14', 'MYJOB', 'STEP1'],
+    requiredKeywords: ['JOB', 'EXEC', 'PGM=IEFBR14', 'MYJOB', 'STEP1'],
   },
   'jcl-conditional': {
     requiredKeywords: ['PGM=IEFBR14', 'IF', 'THEN', 'ENDIF', 'RC', 'PGM=PROGB'],
@@ -45,7 +75,7 @@ export const ACTIVITY_RULES: Record<string, ActivityRule> = {
     ]
   },
   'jcl-flexibility': {
-    requiredKeywords: ['PROC', 'BACKUP', 'LVL', 'EXEC', 'PGM=IEBGENER'],
+    requiredKeywords: ['PROC', 'BACKUP', 'LVL', 'EXEC', 'PGM=IEBGENER', 'PEND'],
   },
   'jcl-resilience': {
     requiredKeywords: ['JOB', 'RESTART=STEP2'],
@@ -109,7 +139,9 @@ export function validateActivity(track: string, moduleId: string, code: string) 
     return []
   }
 
-  const codeUpper = code.toUpperCase()
+  // Strip comments so guided scaffold comments don't satisfy requirements
+  const cleanCode = stripComments(track, code)
+  const codeUpper = cleanCode.toUpperCase()
   
   // 1. Check Required Keywords
   for (const kw of rule.requiredKeywords) {
@@ -130,7 +162,7 @@ export function validateActivity(track: string, moduleId: string, code: string) 
   // 3. Check Regex Validations
   if (rule.regexValidations) {
     for (const validation of rule.regexValidations) {
-      if (!validation.pattern.test(code)) {
+      if (!validation.pattern.test(cleanCode)) {
         return [{ line: 1, message: validation.errorMessage, severity: 'error' as const }]
       }
     }
@@ -138,7 +170,7 @@ export function validateActivity(track: string, moduleId: string, code: string) 
 
   // 4. Custom Validator
   if (rule.customValidator) {
-    const result = rule.customValidator(code)
+    const result = rule.customValidator(cleanCode)
     if (result && !result.valid) {
       return [{ line: 1, message: result.message || 'Custom validation failed.', severity: 'error' as const }]
     }

@@ -16,7 +16,6 @@ You link this status variable to your file in the `ENVIRONMENT DIVISION` using t
        FILE-CONTROL.
            SELECT MY-FILE ASSIGN TO MYFILE
                   FILE STATUS IS WS-FILE-STATUS.
-
 ```
 
 _(Note: `WS-FILE-STATUS` must be declared in your `WORKING-STORAGE SECTION` as a 2-byte string: `01 WS-FILE-STATUS PIC X(2).`)_
@@ -48,7 +47,62 @@ Placed at the very top of the `PROCEDURE DIVISION`, `DECLARATIVES` act like a gl
 
        MAIN-LOGIC SECTION.
            * Your normal, day-to-day program logic starts down here...
+```
 
+---
+
+## 3. Sample Program: File Status Analyzer & Error Trap
+
+Here is a complete, runnable COBOL program demonstrating how to intercept and handle status codes:
+
+```cobol
+      *----------------------------------------------------------------*
+      * PROGRAM:    EXCEPTION-DEMO                                     *
+      * PURPOSE:    DEMONSTRATE FILE STATUS CODE EVALUATION & TRAPPING *
+      *----------------------------------------------------------------*
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. EXCEPTION-DEMO.
+
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT ACCT-FILE ASSIGN TO ACCTFILE
+                  ORGANIZATION IS INDEXED
+                  ACCESS MODE IS RANDOM
+                  RECORD KEY IS AF-KEY
+                  FILE STATUS IS WS-FILE-STATUS.
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD  ACCT-FILE.
+       01  AF-RECORD.
+           05 AF-KEY       PIC 9(05).
+           05 AF-DATA      PIC X(50).
+
+       WORKING-STORAGE SECTION.
+       01  WS-FILE-STATUS  PIC X(02) VALUE '00'.
+
+       PROCEDURE DIVISION.
+       000-MAIN.
+      * Simulate checking status after a file operation
+           MOVE '22' TO WS-FILE-STATUS.
+
+           DISPLAY 'CURRENT STATUS CODE: ' WS-FILE-STATUS.
+
+           EVALUATE WS-FILE-STATUS
+               WHEN '00'
+                   DISPLAY 'OPERATION COMPLETED SUCCESSFULLY (RC 00)'
+               WHEN '10'
+                   DISPLAY 'END OF FILE REACHED (EOF)'
+               WHEN '22'
+                   DISPLAY 'ERROR: DUPLICATE PRIMARY KEY DETECTED!'
+               WHEN '23'
+                   DISPLAY 'ERROR: REQUESTED RECORD DOES NOT EXIST.'
+               WHEN OTHER
+                   DISPLAY 'UNEXPECTED I/O ERROR: ' WS-FILE-STATUS
+           END-EVALUATE.
+
+           STOP RUN.
 ```
 
 ---
@@ -59,9 +113,28 @@ Let's practice checking file status codes manually. Imagine you just tried to wr
 
 **Your tasks:**
 
-1. Assume the variable `WS-FILE-STATUS` has just been updated by a `WRITE` statement.
-2. Construct an `IF` statement to check if `WS-FILE-STATUS` is equal to `'22'`.
-3. Inside the `IF` block, use `DISPLAY` to print `"Duplicate Key Error!"`.
-4. Close your logical block properly with the `END-IF.` scope terminator.
+1. Create your `IDENTIFICATION DIVISION.` with `PROGRAM-ID. EXCEPTION-APP.`.
+2. In `WORKING-STORAGE SECTION`, declare `01 WS-FILE-STATUS PIC X(02) VALUE '22'.`.
+3. In `PROCEDURE DIVISION.`, construct an `IF` statement to check if `WS-FILE-STATUS = '22'`.
+4. Inside the `IF` block, `DISPLAY 'Duplicate Key Error!'`.
+5. Close the block with `END-IF.` and terminate with `STOP RUN.`
+
+**Sample Code to Start With:**
+
+```cobol
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. EXCEPTION-APP.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 WS-FILE-STATUS PIC X(02) VALUE '22'.
+
+       PROCEDURE DIVISION.
+       100-MAIN.
+           IF WS-FILE-STATUS = '22'
+               DISPLAY 'Duplicate Key Error!'
+           END-IF.
+           STOP RUN.
+```
 
 **⚠️ Warning:** Because `WS-FILE-STATUS` is defined as `PIC X(2)` (an alphanumeric string), the value `22` is treated as text, not a number! You must wrap the `22` in quotes in your `IF` condition. Also, ensure your logic starts in **Area B** (Column 12)!
