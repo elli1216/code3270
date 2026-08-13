@@ -1,5 +1,6 @@
-import { Code2, Server, FilePlus, Upload, Trash2 } from 'lucide-react'
-import type { SavedFile } from '../../hooks/useWorkspace'
+import { memo } from 'react'
+import { Code2, Server, FilePlus, Upload, Trash2, X, FolderKanban } from 'lucide-react'
+import type { SavedFile } from '../../store/workspaceStore'
 
 interface SyntaxSidebarProps {
   savedFiles: SavedFile[];
@@ -9,23 +10,27 @@ interface SyntaxSidebarProps {
   onImportClick: () => void;
   onDeleteFile: (id: string) => void;
   onSelectFile: (file: SavedFile) => void;
+  isMobile?: boolean;
+  onCloseMobile?: () => void;
 }
 
-export function SyntaxSidebar({
+export const SyntaxSidebar = memo(function SyntaxSidebar({
   savedFiles,
   activeFileId,
   maxFiles,
   onNewFile,
   onImportClick,
   onDeleteFile,
-  onSelectFile
+  onSelectFile,
+  isMobile = false,
+  onCloseMobile
 }: SyntaxSidebarProps) {
   return (
-    <div className="hidden md:flex flex-col w-64 bg-[#0a0f12] border-r border-slate-800/60 shadow-[4px_0_24px_rgba(0,0,0,0.2)] z-20">
-      <div className="h-[60px] flex items-center justify-between px-5 border-b border-slate-800/60 shrink-0 bg-[#0d1317]">
+    <div className={`flex flex-col bg-[#0a0f12] border-r border-slate-800/60 shadow-[4px_0_24px_rgba(0,0,0,0.2)] z-20 ${isMobile ? 'w-full h-full' : 'hidden md:flex w-64'}`}>
+      <div className="h-[56px] sm:h-[60px] flex items-center justify-between px-4 sm:px-5 border-b border-slate-800/60 shrink-0 bg-[#0d1317]">
         <span className="text-[11px] font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
-          Workspace
+          <FolderKanban size={15} className="text-emerald-400" />
+          Workspace Files
         </span>
         <div className="flex items-center gap-1">
           <button 
@@ -42,6 +47,15 @@ export function SyntaxSidebar({
           >
             <Upload size={15} />
           </button>
+          {isMobile && onCloseMobile && (
+            <button
+              onClick={onCloseMobile}
+              className="w-7 h-7 flex items-center justify-center rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-all ml-1"
+              title="Close Drawer"
+            >
+              <X size={16} />
+            </button>
+          )}
         </div>
       </div>
       
@@ -64,22 +78,25 @@ export function SyntaxSidebar({
                   ? 'bg-emerald-500/10 text-emerald-400 shadow-[inset_2px_0_0_0_rgba(16,185,129,1)]' 
                   : 'text-slate-400 hover:bg-slate-800/40 hover:text-slate-200'
                 }`}
-              onClick={() => onSelectFile(f)}
+              onClick={() => {
+                onSelectFile(f)
+                if (isMobile && onCloseMobile) onCloseMobile()
+              }}
             >
               {/* Subtle background glow for active item */}
               {activeFileId === f.id && (
                 <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-transparent opacity-50"></div>
               )}
 
-              <div className="flex items-center gap-3 overflow-hidden relative z-10">
+              <div className="flex items-center gap-2.5 overflow-hidden relative z-10">
                 <div className={`p-1.5 rounded-md ${activeFileId === f.id ? 'bg-emerald-500/20' : 'bg-slate-800/80 group-hover:bg-slate-700'}`}>
                   {f.lang === 'cobol' ? <Code2 size={13} className={activeFileId === f.id ? 'text-emerald-400' : 'text-slate-400'}/> : <Server size={13} className={activeFileId === f.id ? 'text-emerald-400' : 'text-slate-400'}/>}
                 </div>
-                <span className="truncate font-medium select-none text-[12px] tracking-wide">{f.name}</span>
+                <span className="truncate font-medium select-none text-xs tracking-wide">{f.name}</span>
               </div>
               <button 
                 onClick={(e) => { e.stopPropagation(); onDeleteFile(f.id) }}
-                className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md text-slate-500 hover:text-red-400 hover:bg-red-400/10 transition-all relative z-10 shrink-0"
+                className="opacity-80 md:opacity-0 group-hover:opacity-100 p-1.5 rounded-md text-slate-500 hover:text-red-400 hover:bg-red-400/10 transition-all relative z-10 shrink-0"
                 title="Delete File"
               >
                 <Trash2 size={13} />
@@ -89,7 +106,7 @@ export function SyntaxSidebar({
         )}
       </div>
       
-      <div className="h-14 border-t border-slate-800/60 flex items-center justify-between px-5 shrink-0 bg-[#0d1317]">
+      <div className="h-14 border-t border-slate-800/60 flex items-center justify-between px-4 sm:px-5 shrink-0 bg-[#0d1317]">
         <div className="flex flex-col">
           <span className="text-[9px] font-bold tracking-widest text-slate-500 uppercase">Storage</span>
           <span className="text-xs text-slate-400 font-mono mt-0.5">{savedFiles.length} / {maxFiles}</span>
@@ -103,4 +120,4 @@ export function SyntaxSidebar({
       </div>
     </div>
   )
-}
+})
