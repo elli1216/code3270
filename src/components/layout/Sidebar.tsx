@@ -114,6 +114,14 @@ export function Sidebar({ onCloseMobile, isMobile = false }: SidebarProps) {
 
         <div className="p-3 sm:p-4 border-t border-slate-800/60 bg-[#0a0f12] flex flex-col gap-2.5">
           <Link
+            to="/setup"
+            onClick={handleLessonClick}
+            className="group flex items-center justify-center gap-2 w-full py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 hover:border-emerald-500/50 text-emerald-400 text-xs sm:text-sm font-semibold rounded-lg transition-all"
+          >
+            <Terminal size={16} className="text-emerald-500/70 group-hover:text-emerald-400 transition-colors" />
+            Local Setup Guide
+          </Link>
+          <Link
             to="/syntax"
             onClick={handleLessonClick}
             className="group flex items-center justify-center gap-2 w-full py-2.5 bg-slate-800/40 hover:bg-slate-800 border border-slate-700/50 hover:border-slate-600 text-slate-300 text-xs sm:text-sm font-semibold rounded-lg transition-all"

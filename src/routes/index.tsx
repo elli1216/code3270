@@ -179,6 +179,29 @@ function LandingPage() {
           </motion.div>
         </div>
 
+        {/* Setup Guide Banner */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="w-full mt-6 sm:mt-8 p-6 sm:p-8 rounded-2xl sm:rounded-3xl bg-emerald-500/5 border border-emerald-500/20 backdrop-blur-xl flex flex-col sm:flex-row items-center justify-between gap-6 hover:bg-emerald-500/10 transition-all"
+        >
+          <div>
+            <h2 className="text-xl sm:text-2xl font-bold mb-2 text-emerald-300">GnuCOBOL Setup Guide</h2>
+            <p className="text-slate-400 font-light text-sm sm:text-base max-w-2xl">
+              Want to compile and run COBOL locally on your own Windows machine? Follow our step-by-step guide to install the compiler and configure VSCode.
+            </p>
+          </div>
+          <Link
+            to="/setup"
+            className="group shrink-0 inline-flex items-center gap-2 px-6 py-3 bg-slate-800/80 hover:bg-slate-700 text-emerald-400 rounded-xl font-semibold text-sm sm:text-base transition-all border border-slate-700 hover:border-emerald-500/30"
+          >
+            View Setup Guide
+            <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </motion.div>
+
         {/* Dynamic History Section */}
         <HistorySection />
       </main>

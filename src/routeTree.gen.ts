@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as LearnRouteImport } from './routes/learn'
+import { Route as SetupRouteImport } from './routes/setup'
 import { Route as SyntaxRouteImport } from './routes/syntax'
 
 const IndexRoute = IndexRouteImport.update({
@@ -29,6 +30,11 @@ const LearnRoute = LearnRouteImport.update({
   path: '/learn',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SetupRoute = SetupRouteImport.update({
+  id: '/setup',
+  path: '/setup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SyntaxRoute = SyntaxRouteImport.update({
   id: '/syntax',
   path: '/syntax',
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/learn': typeof LearnRoute
+  '/setup': typeof SetupRoute
   '/syntax': typeof SyntaxRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/learn': typeof LearnRoute
+  '/setup': typeof SetupRoute
   '/syntax': typeof SyntaxRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,22 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/learn': typeof LearnRoute
+  '/setup': typeof SetupRoute
   '/syntax': typeof SyntaxRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$' | '/learn' | '/syntax'
+  fullPaths: '/' | '/$' | '/learn' | '/setup' | '/syntax'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$' | '/learn' | '/syntax'
-  id: '__root__' | '/' | '/$' | '/learn' | '/syntax'
+  to: '/' | '/$' | '/learn' | '/setup' | '/syntax'
+  id: '__root__' | '/' | '/$' | '/learn' | '/setup' | '/syntax'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SplatRoute: typeof SplatRoute
   LearnRoute: typeof LearnRoute
+  SetupRoute: typeof SetupRoute
   SyntaxRoute: typeof SyntaxRoute
 }
 
@@ -92,6 +102,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LearnRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/setup': {
+      id: '/setup'
+      path: '/setup'
+      fullPath: '/setup'
+      preLoaderRoute: typeof SetupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/syntax': {
       id: '/syntax'
       path: '/syntax'
@@ -106,6 +123,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SplatRoute: SplatRoute,
   LearnRoute: LearnRoute,
+  SetupRoute: SetupRoute,
   SyntaxRoute: SyntaxRoute,
 }
 export const routeTree = rootRouteImport
