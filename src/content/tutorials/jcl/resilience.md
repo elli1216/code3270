@@ -74,6 +74,15 @@ Here is a complete, multi-step JCL script configured to safely recover and resum
 
 ---
 
+---
+
+## 📚 Glossary of Clauses & Reserved Words
+
+- **`RESTART=`**: A parameter on the JOB statement used to bypass preceding steps and resume execution precisely at a specified step.
+- **Dot Notation (`STEP.PROCSTP`)**: Syntax used with the RESTART parameter to pinpoint and resume at a specific step located inside a called procedure.
+
+---
+
 ## 💻 Activity: The Skip Forward
 
 Let's practice bypassing successful steps. Imagine you have a JCL script with three steps (`STEP1`, `STEP2`, and `STEP3`). `STEP1` ran successfully, but `STEP2` crashed. You have fixed the error and are ready to resume.

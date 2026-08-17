@@ -104,6 +104,20 @@ Here is a complete pair of COBOL programs showing how the calling program and th
 
 ---
 
+---
+
+## 📚 Glossary of Clauses & Reserved Words
+
+- **`COPY`**: A compiler directive used to insert code from an external copybook directly into the program during compilation.
+- **`REPLACING`**: A clause used with COPY to dynamically substitute text within the copybook (like variable prefixes) as it is imported.
+- **`CALL`**: A verb used to execute an external, separately compiled COBOL program (subprogram).
+- **`USING`**: A clause used with CALL (and in the LINKAGE SECTION) to pass parameters between programs.
+- **`BY REFERENCE`**: The default calling method where the subprogram receives a pointer to the original memory, allowing it to modify the caller's variables directly.
+- **`BY CONTENT`**: A calling method where the subprogram receives a copy of the data, protecting the caller's original variables from modification.
+- **`LINKAGE SECTION`**: A section in the DATA DIVISION of a subprogram used to map memory passed from a calling program.
+
+---
+
 ## 💻 Activity: Making the Call
 
 Let's wire up a module. Imagine you are building a financial dashboard and need to offload a heavy calculation to a dedicated math utility program.

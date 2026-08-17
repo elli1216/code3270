@@ -92,7 +92,7 @@ Here is a complete, runnable COBOL program that defines an indexed VSAM file, op
 
            READ CUST-KSDS
                INVALID KEY
-                   DISPLAY 'STATUS 404: RECORD NOT FOUND FOR ID ' 
+                   DISPLAY 'STATUS 404: RECORD NOT FOUND FOR ID '
                            CK-ACCOUNT-NO
                NOT INVALID KEY
                    DISPLAY 'FOUND ACCOUNT: ' CK-ACCOUNT-NO
@@ -103,6 +103,21 @@ Here is a complete, runnable COBOL program that defines an indexed VSAM file, op
            CLOSE CUST-KSDS.
            STOP RUN.
 ```
+
+---
+
+---
+
+## 📚 Glossary of Clauses & Reserved Words
+
+- **`ORGANIZATION IS INDEXED`**: Specifies that the file uses an indexed structure (like VSAM KSDS) rather than a sequential one.
+- **`ACCESS MODE IS DYNAMIC`**: Allows the program to read the file both sequentially (record by record) and randomly (by specific key).
+- **`RECORD KEY IS`**: Defines the primary, unique key used to index and retrieve records.
+- **`ALTERNATE RECORD KEY IS`**: Defines a secondary key for lookup (e.g., looking up a customer by name instead of ID).
+- **`WITH DUPLICATES`**: An optional clause used with ALTERNATE RECORD KEY to allow multiple records to share the same alternate key.
+- **`INVALID KEY`**: A conditional clause used with READ and WRITE that triggers if the specified key is not found (during READ) or already exists (during WRITE).
+- **`START`**: A verb used to position the file pointer at a specific record based on a key condition, without actually loading the record into the buffer.
+- **`READ ... NEXT`**: A verb used in DYNAMIC access mode to read the next sequential record after positioning the pointer with START.
 
 ---
 

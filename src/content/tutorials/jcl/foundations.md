@@ -93,6 +93,21 @@ Here is a complete, real-world JCL batch job demonstrating how the `JOB`, `EXEC`
 
 ---
 
+---
+
+## 📚 Glossary of Clauses & Reserved Words
+
+- **`JOB`**: The foundational statement that identifies the job to the system, provides billing information, and sets global parameters.
+- **`CLASS`**: A parameter on the JOB statement that determines which system queue processes the job.
+- **`MSGCLASS`**: A parameter on the JOB statement that dictates where the system logs and output messages are routed.
+- **`EXEC`**: The statement used to define a single execution step within a job and specify the program to run.
+- **`PGM=`**: A parameter on the EXEC statement used to specify the exact name of the compiled program or system utility to execute.
+- **`DD` (Data Definition)**: The statement used to allocate datasets, databases, or system resources and assign them an alias for the program to use.
+- **`DSN=` (Data Set Name)**: A parameter on the DD statement used to specify the actual physical path/name of the file on the mainframe.
+- **`DISP=` (Disposition)**: A parameter on the DD statement that tells the system the current state of the file and what to do with it after the step finishes (e.g., `SHR`, `NEW`, `DELETE`, `CATLG`).
+
+---
+
 ## 💻 Activity: The Do-Nothing Job
 
 It is time to write your first JCL script. We are going to execute a legendary mainframe program called `IEFBR14`.

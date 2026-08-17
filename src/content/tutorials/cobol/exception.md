@@ -107,6 +107,15 @@ Here is a complete, runnable COBOL program demonstrating how to intercept and ha
 
 ---
 
+---
+
+## 📚 Glossary of Clauses & Reserved Words
+
+- **`DECLARATIVES`**: A special reserved section at the very beginning of the PROCEDURE DIVISION used exclusively for global event and error handling.
+- **`USE AFTER STANDARD ERROR PROCEDURE ON`**: A declarative statement that binds a specific paragraph to execute automatically whenever an I/O error occurs on a designated file.
+
+---
+
 ## 💻 Activity: Catch the Duplicate
 
 Let's practice checking file status codes manually. Imagine you just tried to write a new user to the system, and you need to verify if the write was successful or if the user already exists.

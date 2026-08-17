@@ -65,6 +65,26 @@ For iterating over code, we use **Inline Loops**. The `PERFORM VARYING` construc
            END-PERFORM.
 ```
 
+### Condition-Based Loops (`PERFORM UNTIL`)
+
+Instead of counting, you can loop until a specific condition is met. This is COBOL's equivalent of a `while` or `repeat...until` loop.
+
+```cobol
+       PROCEDURE DIVISION.
+       PROCESS-FILE.
+           PERFORM UNTIL END-OF-FILE = 'Y'
+               READ IN-FILE
+                   AT END MOVE 'Y' TO END-OF-FILE
+               END-READ
+
+               IF END-OF-FILE NOT = 'Y'
+                   DISPLAY 'Processing Record...'
+               END-IF
+           END-PERFORM.
+```
+
+_By default, COBOL tests the condition **before** the loop runs (`WITH TEST BEFORE`). If you want it to run at least once and test at the end, you can explicitly say `PERFORM UNTIL condition WITH TEST AFTER`._
+
 ---
 
 ## 4. Sample Program: Customer Evaluation Engine
@@ -116,6 +136,21 @@ Here is a complete, runnable COBOL program showing `IF-ELSE`, `EVALUATE`, and `P
 
            STOP RUN.
 ```
+
+---
+
+---
+
+## 📚 Glossary of Clauses & Reserved Words
+
+- **`IF` / `ELSE` / `END-IF`**: Standard conditional branching statements.
+- **`EVALUATE`**: The powerful COBOL equivalent of a `switch` or `match` statement.
+- **`WHEN` / `WHEN OTHER`**: Clauses used within EVALUATE to define specific conditions and a default fallback.
+- **`PERFORM`**: The primary verb for iteration and executing out-of-line blocks of code (like calling a function).
+- **`VARYING ... FROM ... BY ... UNTIL`**: Clauses used with PERFORM to create a traditional `for` loop counting structure.
+- **`UNTIL`**: A clause used with PERFORM to loop until a specific condition evaluates to true (like a `while` loop).
+- **`WITH TEST BEFORE` / `WITH TEST AFTER`**: Clauses used with PERFORM UNTIL to dictate whether the condition is checked at the start (default) or the end of the loop.
+- **`TIMES`**: A clause used with PERFORM to execute a block of code a specific, hardcoded number of times.
 
 ---
 

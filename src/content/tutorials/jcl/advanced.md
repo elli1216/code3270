@@ -79,6 +79,18 @@ Here is a complete JCL job illustrating how a GDG index base is configured and c
 
 ---
 
+---
+
+## 📚 Glossary of Clauses & Reserved Words
+
+- **`GDG` (Generation Data Group)**: A cataloged group of chronologically related datasets that allows for automated versioning.
+- **`(0)`**: The relative generation number referencing the current, most recently created version of a GDG dataset.
+- **`(-1), (-2)`**: Relative generation numbers referencing older, past versions of a GDG dataset.
+- **`(+1)`**: A relative generation number instructing the system to allocate a brand new dataset and add it as the newest generation in the group.
+- **`CATLG`**: A disposition parameter (`DISP`) used to officially register a newly created `(+1)` dataset into the GDG tracking catalog upon successful step completion.
+
+---
+
 ## 💻 Activity: Generating the Future
 
 Let's write a `DD` statement to allocate tomorrow's batch file. Imagine your company tracks daily transactions in a GDG base named `PROD.DAILY.TRANS`.

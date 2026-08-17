@@ -10,6 +10,8 @@ export const TUTORIAL_CURRICULUM = [
     modules: [
       { id: 'anatomy', title: 'COBOL Anatomy' },
       { id: 'datatypes', title: 'Data Types (PIC & COMP)' },
+      { id: 'arithmetic', title: 'Arithmetic Operations' },
+      { id: 'stringmanip', title: 'String Manipulation' },
       { id: 'controlflow', title: 'Control Flow (IF & PERFORM)' },
       { id: 'tables', title: 'Table Handling (Arrays)' },
       { id: 'modular', title: 'Modular Design (Copybooks)' }

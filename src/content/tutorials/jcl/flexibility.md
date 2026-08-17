@@ -65,6 +65,17 @@ Here is a complete, runnable JCL script defining a reusable backup procedure and
 
 ---
 
+---
+
+## 📚 Glossary of Clauses & Reserved Words
+
+- **`PROC`**: A statement used to package a block of JCL statements into a reusable procedure (component).
+- **`PEND`**: A statement required to mark the end of an Instream PROC definition.
+- **`&` (Symbolic Parameters)**: The ampersand prefix used to define dynamic variables that can be passed into and resolved within a PROC.
+- **`..` (Double-Period Notation)**: Used when concatenating a symbolic parameter with literal text (e.g., `&ENV..DATA`), where the first period terminates the variable name and the second is the literal character.
+
+---
+
 ## 💻 Activity: Write Your Own PROC
 
 Let's package up the `IEBGENER` utility we learned about earlier into a reusable backup component.

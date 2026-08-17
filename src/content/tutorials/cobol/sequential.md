@@ -117,6 +117,23 @@ Here is a complete, runnable COBOL program that opens an input file, loops until
 
 ---
 
+---
+
+## 📚 Glossary of Clauses & Reserved Words
+
+- **`FILE-CONTROL`**: A paragraph in the ENVIRONMENT DIVISION used to map internal file variables to external physical files.
+- **`SELECT ... ASSIGN TO`**: A clause used in FILE-CONTROL to create the actual mapping between the program's file name and the system's file path.
+- **`ORGANIZATION IS LINE SEQUENTIAL`**: Specifies that the file is a standard text file with records separated by newline characters.
+- **`FD` (File Description)**: An entry in the FILE SECTION that describes the physical structure and record layout of the file.
+- **`OPEN`**: A verb used to make a file available for processing.
+- **`INPUT` / `OUTPUT` / `EXTEND`**: Clauses used with OPEN to specify whether the file is being read from, written to (overwritten), or appended to.
+- **`READ`**: A verb used to load the next sequential record from a file into the program's memory buffer.
+- **`AT END`**: A conditional clause used with READ that triggers when the end of the file (EOF) is reached.
+- **`WRITE`**: A verb used to save the contents of a record buffer out to a physical file.
+- **`CLOSE`**: A verb used to release the file lock and save any pending data to disk.
+
+---
+
 ## 💻 Activity: Open and Close the Vault
 
 Let's practice the procedural commands for file handling. Imagine you have already defined a file named `CUST-FILE` in your Environment and Data divisions.

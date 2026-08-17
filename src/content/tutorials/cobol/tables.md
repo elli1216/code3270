@@ -84,6 +84,19 @@ Here is a complete, working COBOL program demonstrating how to define, initializ
 
 ---
 
+---
+
+## 📚 Glossary of Clauses & Reserved Words
+
+- **`OCCURS`**: A clause used in the DATA DIVISION to define an array (table) by specifying how many times an item repeats.
+- **`INDEXED BY`**: A clause used with OCCURS to define an internal index variable optimized for extremely fast table lookups.
+- **`ASCENDING / DESCENDING KEY`**: A clause used with OCCURS to inform the compiler that the table data is sorted, enabling binary searches.
+- **`SEARCH`**: A verb used to perform a linear (sequential) search through a table.
+- **`SEARCH ALL`**: A verb used to perform a highly optimized binary search through a table (requires sorted keys).
+- **`SET`**: A verb used to manipulate index variables (e.g., setting them to 1, or incrementing them) instead of using standard arithmetic verbs.
+
+---
+
 ## 💻 Activity: Days of the Week
 
 Let's allocate a simple table and assign a value to it.

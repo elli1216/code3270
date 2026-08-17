@@ -136,6 +136,23 @@ Here is a complete, multi-step utility job combining file cleanup and dataset re
 
 ---
 
+---
+
+## 📚 Glossary of Clauses & Reserved Words
+
+- **`IEFBR14`**: A built-in dummy utility program that does nothing but return a success code (`0`). Used primarily to allocate or delete datasets via DD statements without running a real program.
+- **`IEBGENER`**: A system utility used to copy sequential datasets or print them to the system log.
+- **`IDCAMS`**: The Access Method Services utility used to define, delete, and manage VSAM datasets.
+- **`DFSORT` / `Syncsort`**: High-performance utilities used to sort, merge, filter, and reformat data.
+- **`SYSUT1` / `SORTIN`**: Standard DD names expected by utilities to identify the input dataset.
+- **`SYSUT2` / `SORTOUT`**: Standard DD names expected by utilities to identify the output destination.
+- **`SYSPRINT` / `SYSOUT`**: Standard DD names used by utilities to write their execution logs and error messages.
+- **`SYSIN`**: A standard DD name used to provide additional control instructions (like sort parameters or VSAM definitions) to a utility.
+- **`DD DUMMY`**: A special parameter that pretends a file exists but instantly returns an "End of File", useful for feeding empty input.
+- **`DD SYSOUT=*`**: A special parameter that routes output directly to the system spool (master log) instead of a physical file.
+
+---
+
 ## 💻 Activity: The Great Data Copy
 
 Let's put `IEBGENER` to work. We are going to set up a job step that reads an empty dummy file and routes its output directly to the system logs.

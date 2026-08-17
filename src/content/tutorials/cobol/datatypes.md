@@ -24,6 +24,18 @@ COBOL uses specific symbols to define the shape and size of a variable.
 
 ---
 
+## 2. Figurative Constants
+
+COBOL provides special built-in constants called **Figurative Constants** that you can use to represent common values without explicitly defining them:
+
+- **`ZERO`, `ZEROS`, `ZEROES`:** Represents the numeric value `0` or one or more occurrences of the character `"0"`.
+- **`SPACE`, `SPACES`:** Represents one or more blank spaces. Perfect for initializing alphanumeric fields.
+- **`HIGH-VALUE`, `HIGH-VALUES`:** Represents the highest value in the computer's collating sequence. Often used to signal the end of a file.
+- **`LOW-VALUE`, `LOW-VALUES`:** Represents the lowest value in the collating sequence.
+- **`ALL literal`:** Represents one or more occurrences of the string literal (e.g., `MOVE ALL '*' TO WS-LINE`).
+
+---
+
 ## 2. Computational Usage (`COMP`)
 
 By default, COBOL stores numbers as human-readable text (known as `USAGE IS DISPLAY`). For example, the number `12` is stored as the character `"1"` and the character `"2"`.
@@ -68,7 +80,7 @@ Here is a complete, working COBOL program illustrating the declaration and manip
            DISPLAY 'CUSTOMER : ' WS-CUSTOMER-NAME.
            DISPLAY 'ACCT ID  : ' WS-ACCOUNT-ID.
 
-           ADD WS-CURRENT-BAL TO WS-TRANSACTION-AMT 
+           ADD WS-CURRENT-BAL TO WS-TRANSACTION-AMT
                GIVING WS-NEW-BAL.
 
            MOVE WS-NEW-BAL TO WS-DISP-BAL.
@@ -76,6 +88,22 @@ Here is a complete, working COBOL program illustrating the declaration and manip
 
            STOP RUN.
 ```
+
+---
+
+---
+
+## 📚 Glossary of Clauses & Reserved Words
+
+- **`PIC` (PICTURE)**: A clause used to define the exact shape, size, and data type of a variable.
+- **`VALUE`**: A clause used to assign a starting (initial) value to a variable.
+- **`COMP` (COMPUTATIONAL)**: A usage clause that stores a number in pure machine binary format for high-speed calculation.
+- **`COMP-3`**: A usage clause that stores numbers in packed decimal format (2 digits per byte), highly optimized for financial math.
+- **`ZERO` / `ZEROS`**: A figurative constant representing the numeric value 0.
+- **`SPACE` / `SPACES`**: A figurative constant representing one or more blank spaces.
+- **`HIGH-VALUE` / `HIGH-VALUES`**: A figurative constant representing the highest value in the collating sequence (often used for EOF flags).
+- **`LOW-VALUE` / `LOW-VALUES`**: A figurative constant representing the lowest value in the collating sequence.
+- **`ALL`**: A figurative constant used to repeat a specific character to fill a variable's memory space.
 
 ---
 

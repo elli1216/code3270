@@ -80,6 +80,17 @@ Here is a complete, real-world conditional JCL script demonstrating error branch
 
 ---
 
+---
+
+## 📚 Glossary of Clauses & Reserved Words
+
+- **`RC` (Return Code / Condition Code)**: The numeric exit status passed back to the operating system when a program or step finishes (e.g., `0` for Success, `8` for Error).
+- **`IF / THEN`**: A modern JCL construct used to evaluate the success or failure of previous steps before deciding whether to run the enclosed block of steps.
+- **`ELSE`**: A JCL construct used to define an alternative block of steps to run if the IF condition evaluates to false.
+- **`ENDIF`**: A statement required to close an IF/THEN or IF/THEN/ELSE conditional block.
+
+---
+
 ## 💻 Activity: The Gatekeeper
 
 Let's protect a sensitive job step. Imagine `STEP2` runs a critical database update (`PROGB`), and you absolutely do not want it to run unless `STEP1` (`IEFBR14`) was a flawless success.

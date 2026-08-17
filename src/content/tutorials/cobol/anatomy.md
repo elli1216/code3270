@@ -117,6 +117,21 @@ Here is a complete, runnable COBOL program bringing all four divisions together 
 
 ---
 
+---
+
+## 📚 Glossary of Clauses & Reserved Words
+
+- **`IDENTIFICATION DIVISION`**: The mandatory first division; contains program metadata.
+- **`PROGRAM-ID`**: Identifies the compiled name of the program.
+- **`ENVIRONMENT DIVISION`**: The second division; links the program to the physical environment and hardware.
+- **`DATA DIVISION`**: The third division; where all memory and variables are allocated.
+- **`WORKING-STORAGE SECTION`**: A section within the Data Division for declaring temporary variables.
+- **`PROCEDURE DIVISION`**: The final division; contains the actual executable logic and algorithms.
+- **`DISPLAY`**: A verb used to print output to the console or screen.
+- **`STOP RUN`**: A statement that gracefully terminates program execution and returns control to the operating system.
+
+---
+
 ## 💻 Activity: Your First Program
 
 It is time to write your first program. In the editor on the right, construct a complete `HELLO-WORLD` script.
